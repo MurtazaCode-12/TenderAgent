@@ -34,6 +34,36 @@
 
     --radius: 0.75rem;
   }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 6%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 6%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 151 72% 42%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217.2 32.6% 15%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 15%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 15%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 151 72% 42%;
+  }
 }
 
 @layer base {
@@ -44,13 +74,13 @@
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
   body {
-    @apply bg-[#fbfbfb] text-slate-900 antialiased;
+    @apply bg-[#fbfbfb] text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 }
 
-/* Polished Minimalist Card Styling */
+/* Polished Minimalist Card Styling with Dark Mode Support */
 .tender-card {
-  @apply rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md;
+  @apply rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/90 dark:hover:border-slate-700;
 }

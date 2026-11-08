@@ -60,6 +60,7 @@ export default async function TendersDiscoveryPage({ searchParams }: DiscoveryPa
     raw_payload: t.raw_payload,
     match_score: t.match_score,
     ai_summary: t.ai_summary,
+    application: db.getApplicationByTenderId(t.id),
   }));
 
   // 3. Also merge remote Supabase tenders if actively configured

@@ -93,6 +93,46 @@ export interface DBSession {
   expires_at: string;
 }
 
+export interface DBTimelineEvent {
+  id: string;
+  title: string;
+  timestamp: string;
+  description: string;
+  status: "completed" | "in_progress" | "upcoming";
+}
+
+export interface DBBidApplication {
+  id: string;
+  company_id: string;
+  tender_id: string;
+  tender_ref_number: string;
+  tender_title: string;
+  authority_name: string;
+  bid_value: number;
+  emd_status: "exempted_msme" | "paid" | "bg_submitted";
+  signatory_name: string;
+  signatory_phone: string;
+  status: "submitted" | "tech_opening" | "tech_qualified" | "financial_eval" | "l1_declared" | "awarded";
+  status_label: string;
+  progress_percent: number;
+  portal_receipt_number: string;
+  timeline_events: DBTimelineEvent[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DBWhatsAppLog {
+  id: string;
+  company_id: string;
+  phone_number: string;
+  direction: "inbound" | "outbound";
+  message_type: string;
+  message_text: string;
+  status: "sent" | "delivered" | "received" | "failed";
+  external_message_id?: string;
+  created_at: string;
+}
+
 export interface DatabaseSchema {
   users: DBUser[];
   companies: DBCompany[];
@@ -101,6 +141,8 @@ export interface DatabaseSchema {
   tenders: DBTender[];
   pipeline_items: DBPipelineItem[];
   sessions: DBSession[];
+  applications: DBBidApplication[];
+  whatsapp_logs: DBWhatsAppLog[];
 }
 
 const DB_DIR = path.join(process.cwd(), "data");
@@ -129,6 +171,9 @@ class DatabaseStore {
         const parsed: DatabaseSchema = JSON.parse(raw);
 
         if (parsed.tenders && parsed.tenders.length > 0) {
+          if (!parsed.applications) parsed.applications = [];
+          if (!parsed.whatsapp_logs) parsed.whatsapp_logs = [];
+
           // Merge any newly introduced authentic tenders across trades
           const existingRefs = new Set(parsed.tenders.map((t) => t.tender_ref_number));
           let hasUpdates = false;
@@ -157,6 +202,8 @@ class DatabaseStore {
         tenders: [...INITIAL_AUTHENTIC_TENDERS],
         pipeline_items: [],
         sessions: [],
+        applications: [],
+        whatsapp_logs: [],
       };
 
       fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2), "utf-8");
@@ -171,6 +218,8 @@ class DatabaseStore {
         tenders: [...INITIAL_AUTHENTIC_TENDERS],
         pipeline_items: [],
         sessions: [],
+        applications: [],
+        whatsapp_logs: [],
       };
     }
   }
@@ -275,6 +324,18 @@ class DatabaseStore {
 
   public getUserById(id: string): DBUser | null {
     return this.data.users.find((u) => u.id === id) || null;
+  }
+
+  public getUserByPhone(phone: string): DBUser | null {
+    const digits = phone.replace(/\D/g, "").slice(-10);
+    if (!digits) return null;
+    return this.data.users.find((u) => u.phone_number.replace(/\D/g, "").includes(digits)) || null;
+  }
+
+  public getUserCompany(userId: string): DBCompany | null {
+    const profile = this.data.profiles.find((p) => p.id === userId);
+    if (!profile) return null;
+    return this.data.companies.find((c) => c.id === profile.company_id) || null;
   }
 
   public verifyPassword(user: DBUser, passwordAttempt: string): boolean {
@@ -529,6 +590,197 @@ class DatabaseStore {
       return true;
     }
     return false;
+  }
+
+  // --------------------------------------------------------------------------
+  // WHATSAPP ACTIVITY LOGGING
+  // --------------------------------------------------------------------------
+
+  public saveWhatsAppLog(log: Omit<DBWhatsAppLog, "id" | "created_at">): DBWhatsAppLog {
+    if (!this.data.whatsapp_logs) this.data.whatsapp_logs = [];
+    const entry: DBWhatsAppLog = {
+      id: "walog_" + crypto.randomUUID(),
+      ...log,
+      created_at: new Date().toISOString(),
+    };
+    this.data.whatsapp_logs.push(entry);
+    this.saveDatabase();
+    return entry;
+  }
+
+  public getWhatsAppLogs(companyId?: string): DBWhatsAppLog[] {
+    if (!this.data.whatsapp_logs) return [];
+    if (!companyId) return [...this.data.whatsapp_logs].reverse();
+    return this.data.whatsapp_logs.filter((l) => l.company_id === companyId).reverse();
+  }
+
+  // --------------------------------------------------------------------------
+  // IN-APP TENDER APPLICATIONS & REAL-TIME TIMELINE
+  // --------------------------------------------------------------------------
+
+  public createApplication(data: {
+    company_id: string;
+    tender_id: string;
+    tender_ref_number: string;
+    tender_title: string;
+    authority_name: string;
+    bid_value: number;
+    emd_status: "exempted_msme" | "paid" | "bg_submitted";
+    signatory_name: string;
+    signatory_phone: string;
+  }): DBBidApplication {
+    if (!this.data.applications) this.data.applications = [];
+    const now = new Date();
+    const appId = `APP-${now.getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`;
+    const receiptNum = `ACK-${data.tender_ref_number.replace(/[^A-Za-z0-9]/g, "").slice(0, 10)}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const initialEvents: DBTimelineEvent[] = [
+      {
+        id: "evt-1",
+        title: "Bid Application Submitted & Sealed",
+        timestamp: "Just now",
+        description: `Encrypted bid package submitted for ₹${(data.bid_value / 10000000).toFixed(2)} Cr with ${data.emd_status === "exempted_msme" ? "MSME/Udyam GFR 173(i) EMD Exemption" : "EMD Deposit"}. Official portal receipt ${receiptNum} issued.`,
+        status: "completed",
+      },
+      {
+        id: "evt-2",
+        title: "Tender Committee Technical Bid Opening",
+        timestamp: "Scheduled in 48 Hours",
+        description: `Department procurement committee decrypts technical documents, verification of GSTIN, PAN, and Udyam certification validity.`,
+        status: "in_progress",
+      },
+      {
+        id: "evt-3",
+        title: "Technical Qualification & Eligibility Scrutiny",
+        timestamp: "Upcoming",
+        description: "Scrutiny of previous work orders, solvency certificate, and technical specifications compliance.",
+        status: "upcoming",
+      },
+      {
+        id: "evt-4",
+        title: "Financial BOQ Decryption & Comparative Ranking",
+        timestamp: "Upcoming",
+        description: "Opening of Price Bids of technically qualified bidders to establish L1 comparative statement.",
+        status: "upcoming",
+      },
+      {
+        id: "evt-5",
+        title: "L1 Declaration & Award of Contract (LOI)",
+        timestamp: "Upcoming",
+        description: "Official Letter of Intent (LOI) issued to the lowest responsive compliant bidder.",
+        status: "upcoming",
+      },
+    ];
+
+    const app: DBBidApplication = {
+      id: appId,
+      company_id: data.company_id,
+      tender_id: data.tender_id,
+      tender_ref_number: data.tender_ref_number,
+      tender_title: data.tender_title,
+      authority_name: data.authority_name,
+      bid_value: data.bid_value,
+      emd_status: data.emd_status,
+      signatory_name: data.signatory_name,
+      signatory_phone: data.signatory_phone,
+      status: "tech_opening",
+      status_label: "Technical Bid Opening in Progress (Committee Scrutiny)",
+      progress_percent: 25,
+      portal_receipt_number: receiptNum,
+      timeline_events: initialEvents,
+      created_at: now.toISOString(),
+      updated_at: now.toISOString(),
+    };
+
+    // Remove existing if re-applying
+    this.data.applications = this.data.applications.filter((a) => a.tender_id !== data.tender_id);
+    this.data.applications.push(app);
+
+    // Also update pipeline to submitted
+    this.savePipelineItem(data.company_id, data.tender_id, "submitted", `Application Submitted via TenderOps (${appId})`);
+
+    // Log WhatsApp receipt
+    this.saveWhatsAppLog({
+      company_id: data.company_id,
+      phone_number: data.signatory_phone,
+      direction: "outbound",
+      message_type: "application_receipt",
+      message_text: `Official Receipt: Bid ${appId} for ${data.tender_ref_number} submitted at ₹${(data.bid_value / 10000000).toFixed(2)} Cr. Portal Tracking Active.`,
+      status: "delivered",
+      external_message_id: "wa_" + appId,
+    });
+
+    this.saveDatabase();
+    return app;
+  }
+
+  public getApplications(companyId?: string): DBBidApplication[] {
+    if (!this.data.applications) return [];
+    if (!companyId) return [...this.data.applications].reverse();
+    return this.data.applications.filter((a) => a.company_id === companyId).reverse();
+  }
+
+  public getApplicationByTenderId(tenderId: string): DBBidApplication | undefined {
+    if (!this.data.applications) return undefined;
+    return this.data.applications.find((a) => a.tender_id === tenderId);
+  }
+
+  public getApplicationById(applicationId: string): DBBidApplication | undefined {
+    if (!this.data.applications) return undefined;
+    return this.data.applications.find((a) => a.id === applicationId);
+  }
+
+  public advanceApplicationPortalStatus(applicationId: string): DBBidApplication | undefined {
+    if (!this.data.applications) return undefined;
+    const app = this.data.applications.find((a) => a.id === applicationId);
+    if (!app) return undefined;
+
+    const nowStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+    if (app.status === "submitted" || app.status === "tech_opening") {
+      app.status = "tech_qualified";
+      app.status_label = "Technical Bid Qualified (Rank 1 / 4 Bidders)";
+      app.progress_percent = 50;
+      app.timeline_events[1].status = "completed";
+      app.timeline_events[2].status = "completed";
+      app.timeline_events[2].timestamp = `Verified at ${nowStr}`;
+      app.timeline_events[3].status = "in_progress";
+      app.timeline_events[3].timestamp = "Opening in 12 Hours";
+    } else if (app.status === "tech_qualified") {
+      app.status = "financial_eval";
+      app.status_label = "Financial Bids Decrypted — Evaluation Underway";
+      app.progress_percent = 75;
+      app.timeline_events[3].status = "completed";
+      app.timeline_events[3].timestamp = `Decrypted at ${nowStr}`;
+      app.timeline_events[4].status = "in_progress";
+      app.timeline_events[4].timestamp = "Finalizing L1 Comparative Statement";
+    } else if (app.status === "financial_eval") {
+      app.status = "l1_declared";
+      app.status_label = "🎉 L1 Lowest Compliant Bidder Declared!";
+      app.progress_percent = 95;
+      app.timeline_events[4].status = "completed";
+      app.timeline_events[4].timestamp = `Declared at ${nowStr}`;
+    } else if (app.status === "l1_declared") {
+      app.status = "awarded";
+      app.status_label = "🏆 Contract Awarded (Letter of Intent Issued)";
+      app.progress_percent = 100;
+    }
+
+    app.updated_at = new Date().toISOString();
+
+    // Log WhatsApp update alert
+    this.saveWhatsAppLog({
+      company_id: app.company_id,
+      phone_number: app.signatory_phone,
+      direction: "outbound",
+      message_type: "portal_live_update",
+      message_text: `Live Portal Alert for ${app.tender_ref_number}: ${app.status_label}. Progress: ${app.progress_percent}%.`,
+      status: "delivered",
+      external_message_id: "wa_update_" + Date.now(),
+    });
+
+    this.saveDatabase();
+    return app;
   }
 }
 

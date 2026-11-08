@@ -12,7 +12,7 @@ export default async function DashboardLayout({
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-[#fbfbfb] text-slate-900 font-sans antialiased selection:bg-emerald-500 selection:text-white flex flex-col">
+      <div className="min-h-screen bg-[#fbfbfb] text-slate-900 font-sans antialiased selection:bg-emerald-500 selection:text-white dark:bg-slate-950 dark:text-slate-100 flex flex-col">
         {/* Minimalist Top Navigation Header */}
         <MainNavigation user={currentUser?.user} company={currentUser?.company} />
 
@@ -22,12 +22,12 @@ export default async function DashboardLayout({
         </main>
 
         {/* Minimalist Subtle Footer */}
-        <footer className="border-t border-slate-200/60 bg-white/60 py-6 text-center text-xs text-slate-400">
+        <footer className="border-t border-slate-200/60 bg-white/60 py-6 text-center text-xs text-slate-400 dark:border-slate-800/80 dark:bg-slate-900/60 dark:text-slate-500">
           <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p className="font-medium text-slate-500">
+            <p className="font-medium text-slate-500 dark:text-slate-400">
               TenderOps AI — Autonomous Government Procurement Engine & WhatsApp SDR
             </p>
-            <p className="text-slate-400">
+            <p className="text-slate-400 dark:text-slate-500">
               Live Listings across GeM, CPPP & State Portals
             </p>
           </div>

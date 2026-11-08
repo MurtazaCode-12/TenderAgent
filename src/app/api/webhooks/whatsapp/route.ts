@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyMetaSignature } from "@/lib/whatsapp/security";
 import { sendWhatsAppTextMessage, normalizeWhatsAppNumber } from "@/lib/whatsapp/client";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { createAdminSupabaseClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
+import { db } from "@/lib/db/store";
 
 /**
  * Meta Webhook Verification Handshake (GET)
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
   const appSecret = process.env.WHATSAPP_APP_SECRET;
 
   // 1. Validate signature if appSecret is configured in production
-  if (appSecret) {
+  if (appSecret && !appSecret.includes("your-")) {
     const isValid = verifyMetaSignature(rawBody, signature, appSecret);
     if (!isValid) {
       console.error("[WhatsApp Webhook] Invalid HMAC signature. Dropping request.");
@@ -50,8 +51,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Malformed JSON" }, { status: 400 });
   }
 
-  const supabase = createAdminSupabaseClient();
-
   // 2. Process changes
   if (body.entry && body.entry.length > 0) {
     for (const entry of body.entry) {
@@ -65,80 +64,116 @@ export async function POST(req: NextRequest) {
             const senderWaId = msg.from; // e.g. "919876543210"
             const normalizedSender = normalizeWhatsAppNumber(senderWaId);
 
-            // Find contractor profile in database by phone number
-            const { data: profile } = await supabase
-              .from("profiles")
-              .select("id, company_id, full_name, companies(name)")
-              .ilike("phone_number", `%${normalizedSender.slice(-10)}%`)
-              .maybeSingle();
+            // Find contractor profile in Database Store or Supabase
+            let companyId = "00000000-0000-0000-0000-000000000001";
+            let contractorName = "Contractor";
 
-            if (!profile) {
-              console.warn(`[WhatsApp Webhook] Message from unregistered phone: ${senderWaId}`);
-              continue;
+            // Local DB lookup
+            const localUser = db.getUserByPhone(normalizedSender);
+            if (localUser) {
+              contractorName = localUser.full_name;
+              const company = db.getUserCompany(localUser.id);
+              if (company) companyId = company.id;
+            } else if (isSupabaseAdminConfigured()) {
+              try {
+                const supabase = createAdminSupabaseClient();
+                const { data: profile } = await supabase
+                  .from("profiles")
+                  .select("id, company_id, full_name")
+                  .ilike("phone_number", `%${normalizedSender.slice(-10)}%`)
+                  .maybeSingle();
+
+                if (profile) {
+                  companyId = (profile as any).company_id;
+                  contractorName = (profile as any).full_name;
+                }
+              } catch (err) {
+                // Non-blocking
+              }
             }
+
+            // Log inbound message
+            db.saveWhatsAppLog({
+              company_id: companyId,
+              phone_number: normalizedSender,
+              direction: "inbound",
+              message_type: msg.type || "text",
+              message_text: msg.interactive?.button_reply?.title || msg.text?.body || "Inbound message",
+              status: "received",
+              external_message_id: msg.id,
+            });
 
             // Handle Interactive Button Clicks
             if (msg.type === "interactive" && msg.interactive?.button_reply) {
               const buttonId = msg.interactive.button_reply.id;
               const [action, tenderId] = buttonId.split(":");
 
-              // Fetch tender info
-              const { data: tender } = await supabase
-                .from("tenders")
-                .select("tender_ref_number, title")
-                .eq("id", tenderId)
-                .maybeSingle();
-
-              const tenderRef = (tender as any)?.tender_ref_number || "Tender";
+              // Fetch tender info from DB store
+              const tender = db.getTenderById(tenderId);
+              const tenderRef = tender?.tender_ref_number || "Tender";
+              const tenderTitle = tender?.title || "Procurement Opportunity";
 
               if (action === "save_pipeline") {
-                // Upsert into pipeline_items
-                await supabase.from("pipeline_items").upsert(
-                  {
-                    company_id: (profile as any).company_id,
-                    tender_id: tenderId,
-                    stage: "under_review",
-                    assigned_user_id: (profile as any).id,
-                    internal_notes: "Auto-saved via WhatsApp SDR quick-reply button",
-                  },
-                  { onConflict: "company_id,tender_id" }
+                db.savePipelineItem(
+                  companyId,
+                  tenderId,
+                  "under_review",
+                  "Auto-saved via WhatsApp SDR quick-reply button"
                 );
+
+                if (isSupabaseAdminConfigured()) {
+                  try {
+                    const supabase = createAdminSupabaseClient();
+                    await supabase.from("pipeline_items").upsert(
+                      {
+                        company_id: companyId,
+                        tender_id: tenderId,
+                        stage: "under_review",
+                        internal_notes: "Auto-saved via WhatsApp SDR quick-reply button",
+                      },
+                      { onConflict: "company_id,tender_id" }
+                    );
+                  } catch (err) {
+                    // Non-blocking
+                  }
+                }
 
                 await sendWhatsAppTextMessage(
                   senderWaId,
                   `✅ *Saved to Pipeline!*
 
-${tenderRef} is now active in your pipeline under *"Under Review"*.
-Log in to your dashboard to assign teammates or run a Bid Compliance check.`
+${tenderRef} is now active in your TenderOps pipeline under *"Under Review"*.
+Project: ${tenderTitle.slice(0, 80)}...
+
+👉 Open Dashboard to Draft Bid: ${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/pipeline`
                 );
               } else if (action === "check_compliance") {
-                const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://app.tenderops.ai";
+                const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
                 await sendWhatsAppTextMessage(
                   senderWaId,
                   `📄 *AI Bid Compliance Checker*
 
-To audit your bid for ${tenderRef}:
-1. Upload your draft PDF bid document at:
-👉 ${appUrl}/compliance?tenderId=${tenderId}
+To audit your technical proposal for ${tenderRef} against mandatory RFP clauses:
+${appUrl}/compliance?tenderId=${tenderId}
 
-Our AI will scan mandatory clauses, EMD formatting, and missing annexures in 30 seconds.`
+Key Pre-Bid Verification:
+• MSME / Udyam GFR 173(i) Waiver
+• Turnover Solvency Certificate
+• OEM Authorization (MAF)`
                 );
               } else if (action === "pass_tender") {
-                await supabase.from("pipeline_items").upsert(
-                  {
-                    company_id: (profile as any).company_id,
-                    tender_id: tenderId,
-                    stage: "passed",
-                    internal_notes: "Marked as Pass via WhatsApp",
-                  },
-                  { onConflict: "company_id,tender_id" }
+                db.savePipelineItem(
+                  companyId,
+                  tenderId,
+                  "passed",
+                  "Passed via WhatsApp SDR quick-action"
                 );
 
                 await sendWhatsAppTextMessage(
                   senderWaId,
                   `⏭️ *Tender Passed*
 
-We've archived ${tenderRef}. We'll continue monitoring portals and notify you when stronger matches appear!`
+We've noted that ${tenderRef} was passed. We will tune our AI algorithm to show fewer contracts of this profile.`
                 );
               }
             }

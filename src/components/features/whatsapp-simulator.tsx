@@ -1,8 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
 import Link from "next/link";
 import { formatINR } from "@/lib/utils";
+import { dispatchTenderToWhatsAppAction } from "@/actions/whatsapp";
+import { saveToPipelineAction } from "@/actions/tenders";
+import { useToast } from "@/components/ui/toast-context";
 import {
   Smartphone,
   Send,
@@ -17,6 +20,9 @@ import {
   PhoneCall,
   Video,
   MoreVertical,
+  BookmarkPlus,
+  Loader2,
+  Check,
 } from "lucide-react";
 import { CONTRACTOR_TRADES } from "@/types";
 
@@ -141,8 +147,11 @@ const TRADE_ALERT_TEMPLATES: Record<string, {
 };
 
 export function WhatsAppSimulator({ contractorPhone }: { contractorPhone: string }) {
+  const { toast } = useToast();
   const [selectedTrade, setSelectedTrade] = useState<string>("civil");
   const [inputText, setInputText] = useState("");
+  const [targetPhone, setTargetPhone] = useState(contractorPhone);
+  const [isDispatching, startDispatch] = useTransition();
 
   const initialAlert = TRADE_ALERT_TEMPLATES[selectedTrade] || TRADE_ALERT_TEMPLATES.civil;
 
@@ -194,7 +203,28 @@ export function WhatsAppSimulator({ contractorPhone }: { contractorPhone: string
     const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const currentAlert = TRADE_ALERT_TEMPLATES[selectedTrade];
 
-    if (action === "msme_exemption") {
+    if (action === "save_pipeline") {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `u-${Date.now()}`,
+          sender: "user",
+          text: `📥 Save ${currentAlert.tenderRef} to Pipeline`,
+          timestamp: now,
+        },
+        {
+          id: `b-${Date.now() + 1}`,
+          sender: "bot",
+          text: `✅ **SAVED TO YOUR PIPELINE!**\n\n${currentAlert.tenderRef} is now recorded in your active bidding pipeline under *"Under Review"*.\n\nAll teammates can now view the specifications, calculate BOQ margins, or trigger a 1-click bid draft.`,
+          timestamp: now,
+        },
+      ]);
+      toast({
+        type: "success",
+        title: "Saved to Pipeline",
+        description: `${currentAlert.tenderRef} is now in your active bidding pipeline.`,
+      });
+    } else if (action === "msme_exemption") {
       setMessages((prev) => [
         ...prev,
         {
@@ -226,23 +256,35 @@ export function WhatsAppSimulator({ contractorPhone }: { contractorPhone: string
           timestamp: now,
         },
       ]);
-    } else if (action === "draft_bid") {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `u-${Date.now()}`,
-          sender: "user",
-          text: `Draft complete bid package for ${currentAlert.tenderRef}`,
-          timestamp: now,
-        },
-        {
-          id: `b-${Date.now() + 1}`,
-          sender: "bot",
-          text: `⚡ **BID PACKAGE READY FOR 1-CLICK EXPORT!**\n\nI have generated the statutory annexures for **${currentAlert.tenderRef}**:\n1. GFR 173(i) MSME EMD Exemption Affidavit\n2. Make In India (MII) Class-1 Declaration (>50%)\n3. Non-Blacklisting & Anti-Collusion Undertaking\n4. ${currentAlert.qualPill} Technical Schedule\n\nTap below to review, copy, or print your formatted legal documents.`,
-          timestamp: now,
-        },
-      ]);
     }
+  };
+
+  const handleDispatchRealWhatsApp = () => {
+    startDispatch(async () => {
+      try {
+        const dummyTenderId = "00000000-0000-0000-0000-000000000010";
+        const res = await dispatchTenderToWhatsAppAction(dummyTenderId, targetPhone);
+        if (res.success) {
+          toast({
+            type: "success",
+            title: "WhatsApp SDR Message Dispatched!",
+            description: `Sent interactive tender alert to ${targetPhone}. Check your WhatsApp messages.`,
+          });
+        } else {
+          toast({
+            type: "info",
+            title: "WhatsApp Sandbox Mode",
+            description: "Message logged to database store. Configure META API credentials in .env.local to receive live SMS/WhatsApp on your handset.",
+          });
+        }
+      } catch (err: any) {
+        toast({
+          type: "error",
+          title: "WhatsApp Dispatch Error",
+          description: err.message || "Failed to contact Meta WhatsApp API.",
+        });
+      }
+    });
   };
 
   const handleSendMessage = (e?: React.FormEvent) => {
@@ -285,35 +327,52 @@ export function WhatsAppSimulator({ contractorPhone }: { contractorPhone: string
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xs">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Top Banner & Live Phone Dispatch Test */}
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-2xs dark:border-slate-800 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex items-start gap-3.5">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm shrink-0">
               <Smartphone className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900">
-                Interactive WhatsApp SDR Mobile Simulator
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                Interactive WhatsApp SDR Mobile Simulator & Live Dispatch
               </h2>
-              <p className="mt-0.5 text-xs text-slate-600">
-                Indian government contractors manage multi-crore bids on WhatsApp. Experience how TenderOps AI alerts contractors in real-time, provides 1-tap eligibility audits, and drafts bid packages directly on mobile.
+              <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400 max-w-2xl">
+                Experience how TenderOps AI alerts contractors on WhatsApp in real-time, provides 1-tap eligibility audits, MSME EMD waivers, and bid application receipts directly on mobile.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-semibold text-emerald-800">
-              SDR Bot Active: {contractorPhone}
-            </span>
+          {/* Real Phone Number Test Strip */}
+          <div className="flex flex-wrap items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-200/70 dark:bg-slate-800/80 dark:border-slate-700">
+            <input
+              type="text"
+              value={targetPhone}
+              onChange={(e) => setTargetPhone(e.target.value)}
+              placeholder="+91 98201 44820"
+              className="h-8 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-mono text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-white w-36"
+            />
+            <button
+              type="button"
+              onClick={handleDispatchRealWhatsApp}
+              disabled={isDispatching}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition disabled:opacity-50"
+            >
+              {isDispatching ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Send className="h-3 w-3" />
+              )}
+              <span>Send Live Alert</span>
+            </button>
           </div>
         </div>
       </div>
 
       {/* Trade Selector Switcher */}
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-3 shadow-xs">
-        <div className="text-xs font-bold uppercase tracking-wider text-slate-700 pb-2 px-1">
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-xs dark:border-slate-800 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100">
+        <div className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 pb-2 px-1">
           Switch Contractor Trade to Test Alerts:
         </div>
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
@@ -323,8 +382,8 @@ export function WhatsAppSimulator({ contractorPhone }: { contractorPhone: string
               onClick={() => switchTrade(trade.id)}
               className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition ${
                 selectedTrade === trade.id
-                  ? "bg-slate-900 text-white shadow-xs"
-                  : "bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200"
+                  ? "bg-slate-900 text-white shadow-xs dark:bg-emerald-600 dark:text-white"
+                  : "bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
               }`}
             >
               <span>{trade.icon}</span>
@@ -384,7 +443,7 @@ export function WhatsAppSimulator({ contractorPhone }: { contractorPhone: string
                 if (msg.isInteractiveCard && msg.tenderData) {
                   const t = msg.tenderData;
                   return (
-                    <div key={msg.id} className="max-w-[92%] rounded-2xl bg-white p-3.5 shadow-sm space-y-2 border border-slate-200/60">
+                    <div key={msg.id} className="max-w-[92%] rounded-2xl bg-white p-3.5 shadow-sm space-y-2 border border-slate-200/60 text-slate-900">
                       {/* Alert Header */}
                       <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
@@ -422,6 +481,15 @@ export function WhatsAppSimulator({ contractorPhone }: { contractorPhone: string
 
                       {/* Interactive WhatsApp Quick Action Buttons */}
                       <div className="pt-1 space-y-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleActionClick("save_pipeline")}
+                          className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-slate-900 hover:bg-slate-800 py-1.5 text-xs font-bold text-white transition shadow-2xs"
+                        >
+                          <BookmarkPlus className="h-3 w-3" />
+                          <span>📥 Save to Pipeline</span>
+                        </button>
+
                         <a
                           href={t.directUrl}
                           target="_blank"

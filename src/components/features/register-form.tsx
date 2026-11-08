@@ -68,8 +68,6 @@ export function RegisterForm() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [scanningStep, setScanningStep] = useState<string>("");
 
   // Form State
   const [username, setUsername] = useState("");
@@ -77,76 +75,89 @@ export function RegisterForm() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [companyName, setCompanyName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("+91 ");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [minTenderValue, setMinTenderValue] = useState<number>(500000);
+  const [maxTenderValue, setMaxTenderValue] = useState<number | null>(null);
   const [selectedTrades, setSelectedTrades] = useState<string[]>([
-    "Information Technology & Software",
-    "Cloud Infrastructure & Data Centers",
+    "Civil Infrastructure & Works",
   ]);
   const [customTrade, setCustomTrade] = useState("");
-  const [minTenderValue, setMinTenderValue] = useState<number>(5000000); // 50 Lakhs
-  const [maxTenderValue, setMaxTenderValue] = useState<number | null>(100000000); // 10 Crores
-  const [selectedStates, setSelectedStates] = useState<string[]>(["PAN_INDIA", "Delhi", "Maharashtra"]);
+  const [selectedStates, setSelectedStates] = useState<string[]>(["PAN_INDIA"]);
   const [selectedCerts, setSelectedCerts] = useState<string[]>([
-    "MSME / Udyam Registered",
-    "ISO 9001:2015",
+    "MSME / Udyam Registered (GFR 173(i) Waiver)",
   ]);
-  const [summary, setSummary] = useState(
-    "Enterprise IT system integrator providing cloud computing, networking firewalls, and digital software solutions to Central & State Government departments."
-  );
+
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [scanningStep, setScanningStep] = useState<string>("");
 
   const toggleTrade = (trade: string) => {
-    setSelectedTrades((prev) =>
-      prev.includes(trade) ? prev.filter((t) => t !== trade) : [...prev, trade]
-    );
+    if (selectedTrades.includes(trade)) {
+      if (selectedTrades.length > 1) {
+        setSelectedTrades(selectedTrades.filter((t) => t !== trade));
+      }
+    } else {
+      setSelectedTrades([...selectedTrades, trade]);
+    }
   };
 
-  const toggleState = (state: string) => {
-    if (state === "PAN_INDIA") {
+  const toggleState = (st: string) => {
+    if (st === "PAN_INDIA") {
       setSelectedStates(["PAN_INDIA"]);
       return;
     }
     const filtered = selectedStates.filter((s) => s !== "PAN_INDIA");
-    if (filtered.includes(state)) {
-      const next = filtered.filter((s) => s !== state);
-      setSelectedStates(next.length === 0 ? ["PAN_INDIA"] : next);
+    if (filtered.includes(st)) {
+      const remaining = filtered.filter((s) => s !== st);
+      setSelectedStates(remaining.length === 0 ? ["PAN_INDIA"] : remaining);
     } else {
-      setSelectedStates([...filtered, state]);
+      setSelectedStates([...filtered, st]);
     }
   };
 
   const toggleCert = (cert: string) => {
-    setSelectedCerts((prev) =>
-      prev.includes(cert) ? prev.filter((c) => c !== cert) : [...prev, cert]
-    );
+    if (selectedCerts.includes(cert)) {
+      setSelectedCerts(selectedCerts.filter((c) => c !== cert));
+    } else {
+      setSelectedCerts([...selectedCerts, cert]);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage(null);
 
-    const formData = new FormData();
-    formData.append("username", username);
-    formData.append("email", email);
-    formData.append("password", password);
-    formData.append("fullName", fullName);
-    formData.append("companyName", companyName);
-    formData.append("phoneNumber", phoneNumber);
+    if (password.length < 6) {
+      setErrorMessage("Password must be at least 6 characters long.");
+      return;
+    }
 
     const allTrades = [...selectedTrades];
     if (customTrade.trim() && !allTrades.includes(customTrade.trim())) {
       allTrades.push(customTrade.trim());
     }
 
-    formData.append("targetCategories", allTrades.join(", "));
-    formData.append("preferredStates", selectedStates.join(", "));
-    formData.append("certifications", selectedCerts.join(", "));
-    formData.append("minTenderValue", String(minTenderValue));
-    formData.append("maxTenderValue", maxTenderValue ? String(maxTenderValue) : "");
-    formData.append("summary", summary);
+    if (allTrades.length === 0) {
+      setErrorMessage("Please select at least one industry/trade to search tenders.");
+      return;
+    }
 
-    setScanningStep("1/4: Storing contractor profile in connected database...");
+    const formData = new FormData();
+    formData.append("username", username.trim());
+    formData.append("email", email.trim());
+    formData.append("password", password);
+    formData.append("full_name", fullName.trim());
+    formData.append("company_name", companyName.trim());
+    formData.append("phone_number", phoneNumber.trim());
+    formData.append("min_tender_value", String(minTenderValue));
+    if (maxTenderValue) {
+      formData.append("max_tender_value", String(maxTenderValue));
+    }
+    formData.append("trades", JSON.stringify(allTrades));
+    formData.append("preferred_states", JSON.stringify(selectedStates));
+    formData.append("certifications", JSON.stringify(selectedCerts));
 
     startTransition(async () => {
+      setScanningStep("1/4: Initializing your secure contractor database...");
       try {
         setScanningStep("2/4: Connecting to GeM & CPPP government portals...");
         const res = await registerContractorProfile(formData);
@@ -174,35 +185,35 @@ export function RegisterForm() {
     <div className="w-full max-w-3xl mx-auto py-8 px-4 sm:px-6">
       {/* Brand Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-md">
-          <ShieldCheck className="h-6 w-6 text-emerald-400" />
+        <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 dark:bg-emerald-600 text-white shadow-md">
+          <ShieldCheck className="h-6 w-6 text-emerald-400 dark:text-white" />
         </div>
-        <h1 className="mt-3 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+        <h1 className="mt-3 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
           TenderOps AI
         </h1>
-        <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
+        <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
           by MCodes • India Procurement Engine & WhatsApp SDR
         </p>
-        <p className="mt-2 text-sm text-slate-600 max-w-lg mx-auto">
+        <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 max-w-lg mx-auto">
           Create your contractor profile below. Once submitted, TenderOps AI immediately queries live listings from GeM, CPPP, and State Portals matching your exact industry.
         </p>
       </div>
 
       {/* Main Registration Card */}
-      <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-10 shadow-sm">
+      <div className="rounded-3xl border border-slate-200/80 dark:border-slate-850 bg-white dark:bg-slate-900 p-6 sm:p-10 shadow-sm transition-colors">
         {errorMessage && (
-          <div className="mb-6 rounded-2xl bg-rose-50 border border-rose-200 p-4 text-xs font-semibold text-rose-800">
+          <div className="mb-6 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 p-4 text-xs font-semibold text-rose-800 dark:text-rose-300">
             {errorMessage}
           </div>
         )}
 
         {isPending && scanningStep && (
-          <div className="mb-6 rounded-2xl bg-emerald-50 border border-emerald-200 p-5 text-center space-y-2">
-            <div className="flex items-center justify-center gap-2 text-emerald-800 font-bold text-sm">
-              <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
+          <div className="mb-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 p-5 text-center space-y-2">
+            <div className="flex items-center justify-center gap-2 text-emerald-800 dark:text-emerald-300 font-bold text-sm">
+              <Loader2 className="h-5 w-5 animate-spin text-emerald-600 dark:text-emerald-400" />
               <span>{scanningStep}</span>
             </div>
-            <p className="text-xs text-emerald-700">
+            <p className="text-xs text-emerald-700 dark:text-emerald-400">
               Live crawler scanning GeM (Bidplus), CPPP (eProcure), and State Portals for {selectedTrades[0] || "your industry"}...
             </p>
           </div>
@@ -211,16 +222,16 @@ export function RegisterForm() {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Section 1: Account Credentials */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-              <User className="h-4 w-4 text-emerald-600" />
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+              <User className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
                 1. Account Credentials & Login
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 block">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
                   Username <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
@@ -230,13 +241,13 @@ export function RegisterForm() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="e.g. apex_bids"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 block">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
                   Business Email <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
@@ -246,14 +257,14 @@ export function RegisterForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="e.g. rahul@apexinfotech.com"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   />
                 </div>
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 block">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
                 Account Password <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
@@ -263,12 +274,12 @@ export function RegisterForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 pr-10"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -278,16 +289,16 @@ export function RegisterForm() {
 
           {/* Section 2: Contractor & Company Entity */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-              <Building2 className="h-4 w-4 text-emerald-600" />
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+              <Building2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
                 2. Contractor & Company Details
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 block">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
                   Managing Director / Contractor Name <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -296,12 +307,12 @@ export function RegisterForm() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="e.g. Rahul Sharma"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 block">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
                   Company Legal Entity Name <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -310,13 +321,13 @@ export function RegisterForm() {
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
                   placeholder="e.g. Apex Infotech Pvt Ltd"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 block">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
                 WhatsApp SDR Mobile (+91)
               </label>
               <input
@@ -324,9 +335,9 @@ export function RegisterForm() {
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 placeholder="+91 98765 43210"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-mono text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-xs font-mono text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               />
-              <span className="text-[11px] text-slate-400">
+              <span className="text-[11px] text-slate-400 dark:text-slate-500">
                 Receives automated daily WhatsApp SDR alerts for new tenders exceeding 80% relevance score.
               </span>
             </div>
@@ -334,14 +345,14 @@ export function RegisterForm() {
 
           {/* Section 3: Industry & Trade */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-              <Briefcase className="h-4 w-4 text-emerald-600" />
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+              <Briefcase className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
                 3. Industry & Bidding Trade (For Live Portal Search)
               </h2>
             </div>
 
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Select one or more sectors. Live crawlers will immediately filter GeM, CPPP, and State Portals for opportunities in these categories:
             </p>
 
@@ -356,7 +367,7 @@ export function RegisterForm() {
                     className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
                       selected
                         ? "bg-emerald-600 text-white shadow-xs"
-                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                     }`}
                   >
                     {selected && <Check className="h-3 w-3 stroke-[3]" />}
@@ -367,7 +378,7 @@ export function RegisterForm() {
             </div>
 
             <div className="pt-1">
-              <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+              <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
                 Or Add Custom Trade / Specialty
               </label>
               <input
@@ -375,38 +386,38 @@ export function RegisterForm() {
                 value={customTrade}
                 onChange={(e) => setCustomTrade(e.target.value)}
                 placeholder="e.g. Drone Surveying, Hospital Medical Gas Pipeline, Solar Microgrids"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               />
             </div>
           </div>
 
           {/* Section 4: Budget Range & Locations */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-              <IndianRupee className="h-4 w-4 text-emerald-600" />
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+              <IndianRupee className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
                 4. Contract Value Bracket & Locations
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 block">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
                   Minimum Tender Value (INR)
                 </label>
                 <input
                   type="number"
                   value={minTenderValue}
                   onChange={(e) => setMinTenderValue(Number(e.target.value))}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-mono text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 />
-                <span className="text-[11px] font-medium text-emerald-700">
+                <span className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
                   {formatINR(minTenderValue)}
                 </span>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 block">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
                   Maximum Tender Value (INR)
                 </label>
                 <input
@@ -416,16 +427,16 @@ export function RegisterForm() {
                     setMaxTenderValue(e.target.value ? Number(e.target.value) : null)
                   }
                   placeholder="Leave empty for unlimited cap"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-mono text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 />
-                <span className="text-[11px] font-medium text-emerald-700">
+                <span className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
                   {maxTenderValue ? formatINR(maxTenderValue) : "No Upper Limit"}
                 </span>
               </div>
             </div>
 
             <div className="space-y-2 pt-2">
-              <label className="text-xs font-semibold text-slate-700 block">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
                 Operating States
               </label>
               <div className="flex flex-wrap gap-2">
@@ -439,7 +450,7 @@ export function RegisterForm() {
                       className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
                         selected
                           ? "bg-emerald-600 text-white shadow-xs"
-                          : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                       }`}
                     >
                       {selected && <Check className="h-3 w-3 stroke-[3]" />}
@@ -451,7 +462,7 @@ export function RegisterForm() {
             </div>
 
             <div className="space-y-2 pt-2">
-              <label className="text-xs font-semibold text-slate-700 block">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
                 Certifications (Unlocks Tender EMD & Turnover Exemptions)
               </label>
               <div className="flex flex-wrap gap-2">
@@ -464,8 +475,8 @@ export function RegisterForm() {
                       onClick={() => toggleCert(cert)}
                       className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
                         selected
-                          ? "bg-slate-900 text-white shadow-xs"
-                          : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                          ? "bg-slate-900 dark:bg-emerald-600 text-white shadow-xs"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                       }`}
                     >
                       {selected && <Check className="h-3 w-3 stroke-[3]" />}
@@ -478,7 +489,7 @@ export function RegisterForm() {
           </div>
 
           {/* Submit Button */}
-          <div className="pt-4 border-t border-slate-100 flex flex-col gap-3">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3">
             <button
               type="submit"
               disabled={isPending}
@@ -498,9 +509,9 @@ export function RegisterForm() {
               )}
             </button>
 
-            <div className="text-center text-xs text-slate-500 pt-2">
+            <div className="text-center text-xs text-slate-500 dark:text-slate-400 pt-2">
               Already created a contractor profile?{" "}
-              <Link href="/login" className="font-bold text-emerald-600 hover:underline">
+              <Link href="/login" className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
                 Sign in to your account
               </Link>
             </div>

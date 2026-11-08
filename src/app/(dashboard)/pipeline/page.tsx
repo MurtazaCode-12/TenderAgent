@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { db } from "@/lib/db/store";
 import { getCurrentUser } from "@/actions/auth";
 import { PipelineBoard, type PipelineCardItem } from "@/components/features/pipeline-board";
@@ -72,11 +72,12 @@ export default async function PipelinePage() {
       submission_deadline: item.tender?.submission_deadline || new Date().toISOString(),
       internal_notes: item.internal_notes || "",
       tender_ref_number: item.tender?.tender_ref_number || "",
+      application: db.getApplicationByTenderId(item.tender_id),
     }));
   }
 
-  // 2. Fallback to Supabase or Sample Pipeline if empty
-  if (pipelineItems.length === 0) {
+  // 2. Fallback to Supabase if actively configured
+  if (pipelineItems.length === 0 && isSupabaseConfigured()) {
     try {
       const supabase = await createServerSupabaseClient();
       const { data: dbItems } = await supabase
@@ -95,6 +96,7 @@ export default async function PipelinePage() {
           submission_deadline: item.tenders?.submission_deadline || new Date().toISOString(),
           internal_notes: item.internal_notes || "",
           tender_ref_number: item.tenders?.tender_ref_number || "",
+          application: db.getApplicationByTenderId(item.tender_id),
         }));
       }
     } catch (err) {
@@ -103,7 +105,10 @@ export default async function PipelinePage() {
   }
 
   if (pipelineItems.length === 0) {
-    pipelineItems = SAMPLE_PIPELINE;
+    pipelineItems = SAMPLE_PIPELINE.map((p) => ({
+      ...p,
+      application: db.getApplicationByTenderId(p.tender_id),
+    }));
   }
 
   return <PipelineBoard initialItems={pipelineItems} />;

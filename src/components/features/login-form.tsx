@@ -44,30 +44,30 @@ export function LoginForm() {
   return (
     <div className="w-full max-w-md mx-auto py-12 px-4 sm:px-6">
       <div className="text-center mb-8">
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-md">
-          <ShieldCheck className="h-6 w-6 text-emerald-400" />
+        <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 dark:bg-emerald-600 text-white shadow-md">
+          <ShieldCheck className="h-6 w-6 text-emerald-400 dark:text-white" />
         </div>
-        <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900">
+        <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
           Sign In to TenderOps AI
         </h1>
-        <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
+        <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
           by MCodes • India Procurement Engine
         </p>
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
           Access your live government tenders, active bid pipeline, and WhatsApp SDR alerts
         </p>
       </div>
 
-      <div className="rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm">
+      <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm">
         {errorMessage && (
-          <div className="mb-5 rounded-xl bg-rose-50 border border-rose-200 p-3.5 text-xs font-semibold text-rose-800">
+          <div className="mb-5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 p-3.5 text-xs font-semibold text-rose-800 dark:text-rose-300">
             {errorMessage}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 block">
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
               Username or Business Email
             </label>
             <div className="relative">
@@ -77,13 +77,13 @@ export function LoginForm() {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder="e.g. apex_bids or rahul@domain.com"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 block">
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
               Password
             </label>
             <div className="relative">
@@ -93,12 +93,12 @@ export function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 pr-10"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 pr-10"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -124,9 +124,9 @@ export function LoginForm() {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-xs text-slate-500">
+        <div className="mt-6 text-center text-xs text-slate-500 dark:text-slate-400">
           Need to set up a new contractor profile?{" "}
-          <Link href="/register" className="font-bold text-emerald-600 hover:underline">
+          <Link href="/register" className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
             Create Profile & Search Live Tenders
           </Link>
         </div>

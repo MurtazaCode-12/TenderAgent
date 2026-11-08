@@ -1,4 +1,5 @@
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { createAdminSupabaseClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
+import { db } from "@/lib/db/store";
 import { formatINR, formatTenderDate } from "@/lib/utils";
 import { WhatsAppServiceError } from "@/lib/errors";
 
@@ -22,6 +23,17 @@ export interface WhatsAppSendResult {
 }
 
 /**
+ * Checks if live Meta WhatsApp credentials are configured (non-placeholder).
+ */
+export function isMetaWhatsAppConfigured(): boolean {
+  const token = process.env.WHATSAPP_ACCESS_TOKEN;
+  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  if (!token || !phoneNumberId) return false;
+  if (token.includes("your-") || phoneNumberId.includes("your-")) return false;
+  return true;
+}
+
+/**
  * Normalizes phone numbers to standard international E.164 format without '+' or spaces for Meta API.
  * E.g., "+91 98765 43210" -> "919876543210"
  */
@@ -38,7 +50,6 @@ export function normalizeWhatsAppNumber(phone: string): string {
  * Uses interactive quick-reply buttons ("Save to Pipeline", "Analyze Bid", "Pass").
  */
 export async function sendWhatsAppTenderAlert(input: SendTenderAlertInput): Promise<WhatsAppSendResult> {
-  const supabase = createAdminSupabaseClient();
   const token = process.env.WHATSAPP_ACCESS_TOKEN;
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   const apiVersion = process.env.WHATSAPP_API_VERSION || "v21.0";
@@ -46,7 +57,7 @@ export async function sendWhatsAppTenderAlert(input: SendTenderAlertInput): Prom
 
   const valueFormatted = formatINR(input.estimatedValue);
   const deadlineFormatted = formatTenderDate(input.submissionDeadline);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://app.tenderops.ai";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   // Build high-converting executive text body
   const bodyText = 
@@ -62,7 +73,7 @@ export async function sendWhatsAppTenderAlert(input: SendTenderAlertInput): Prom
 💡 *Executive Brief:*
 ${(input.aiSummary as any)?.executive_summary || "High-value public procurement contract matching your core capabilities and registered turnover thresholds."}
 
-🔗 *View Full RFP & Clauses:* ${appUrl}/tenders/${input.tenderId}`;
+🔗 *View Full RFP & Direct Portal Documents:* ${appUrl}/tenders`;
 
   // Interactive message payload with quick-action buttons
   const interactivePayload = {
@@ -110,27 +121,45 @@ ${(input.aiSummary as any)?.executive_summary || "High-value public procurement 
     },
   };
 
-  // If WhatsApp credentials are not yet configured, log to Supabase in demo mode
-  if (!token || !phoneNumberId) {
-    console.warn("[WhatsApp Client] WhatsApp credentials not configured. Running in simulated sandbox mode.");
+  // 1. If WhatsApp credentials are placeholder or unconfigured, run high-fidelity simulation
+  if (!isMetaWhatsAppConfigured()) {
+    console.log(`[WhatsApp Client] Simulating alert delivery to +${recipient} for ${input.tenderRefNumber}`);
 
-    await supabase.from("whatsapp_logs").insert({
+    db.saveWhatsAppLog({
       company_id: input.companyId,
-      tender_id: input.tenderId,
       phone_number: recipient,
       direction: "outbound",
-      message_type: "interactive",
-      payload: interactivePayload,
+      message_type: "interactive_tender_alert",
+      message_text: bodyText,
       status: "delivered",
-      external_message_id: `sim_${Date.now()}`,
+      external_message_id: `wamid_sim_${Date.now()}`,
     });
+
+    if (isSupabaseAdminConfigured()) {
+      try {
+        const supabase = createAdminSupabaseClient();
+        await supabase.from("whatsapp_logs").insert({
+          company_id: input.companyId,
+          tender_id: input.tenderId,
+          phone_number: recipient,
+          direction: "outbound",
+          message_type: "interactive",
+          payload: interactivePayload,
+          status: "delivered",
+          external_message_id: `sim_${Date.now()}`,
+        });
+      } catch (err) {
+        // Non-blocking
+      }
+    }
 
     return {
       success: true,
-      messageId: `sim_${Date.now()}`,
+      messageId: `wamid_sim_${Date.now()}`,
     };
   }
 
+  // 2. Dispatch to live Meta WhatsApp Cloud API
   try {
     const response = await fetch(
       `https://graph.facebook.com/${apiVersion}/${phoneNumberId}/messages`,
@@ -149,31 +178,30 @@ ${(input.aiSummary as any)?.executive_summary || "High-value public procurement 
     if (!response.ok) {
       console.error("[Meta WhatsApp API Error]:", data);
 
-      // Audit failure log
-      await supabase.from("whatsapp_logs").insert({
+      db.saveWhatsAppLog({
         company_id: input.companyId,
-        tender_id: input.tenderId,
         phone_number: recipient,
         direction: "outbound",
-        message_type: "interactive",
-        payload: interactivePayload,
+        message_type: "interactive_tender_alert",
+        message_text: bodyText,
         status: "failed",
-        error_details: JSON.stringify(data),
+        external_message_id: `fail_${Date.now()}`,
       });
 
-      throw new WhatsAppServiceError(data.error?.message || "Failed to deliver WhatsApp message", data);
+      return {
+        success: false,
+        error: data.error?.message || "Failed to deliver WhatsApp message",
+      };
     }
 
     const messageId = data.messages?.[0]?.id || `wa_${Date.now()}`;
 
-    // Audit success log
-    await supabase.from("whatsapp_logs").insert({
+    db.saveWhatsAppLog({
       company_id: input.companyId,
-      tender_id: input.tenderId,
       phone_number: recipient,
       direction: "outbound",
-      message_type: "interactive",
-      payload: interactivePayload,
+      message_type: "interactive_tender_alert",
+      message_text: bodyText,
       status: "sent",
       external_message_id: messageId,
     });
@@ -200,7 +228,18 @@ export async function sendWhatsAppTextMessage(to: string, message: string): Prom
   const apiVersion = process.env.WHATSAPP_API_VERSION || "v21.0";
   const recipient = normalizeWhatsAppNumber(to);
 
-  if (!token || !phoneNumberId) {
+  // Always log locally
+  db.saveWhatsAppLog({
+    company_id: "00000000-0000-0000-0000-000000000001",
+    phone_number: recipient,
+    direction: "outbound",
+    message_type: "text_receipt",
+    message_text: message,
+    status: "delivered",
+    external_message_id: `sim_reply_${Date.now()}`,
+  });
+
+  if (!isMetaWhatsAppConfigured()) {
     console.log(`[Simulated Inbound Reply to ${recipient}]: ${message}`);
     return { success: true, messageId: `sim_reply_${Date.now()}` };
   }
