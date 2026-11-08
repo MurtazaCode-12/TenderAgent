@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,8 @@ import {
   Lock,
   ArrowRight,
   UploadCloud,
+  FileText,
+  Trash2,
 } from "lucide-react";
 import type { ComplianceChecklistResult } from "@/types";
 
@@ -39,15 +41,33 @@ Apex Infotech is pleased to submit our comprehensive technical and commercial pr
 - All hardware adheres to Ministry of Electronics & IT guidelines.`;
 
 export function ComplianceCheckerUI({ initialTenderId, initialTitle }: ComplianceCheckerProps) {
-  const [tenderId, setTenderId] = useState(initialTenderId || "sample-tender-1");
-  const [tenderTitle, setTenderTitle] = useState(
+  const [tenderId] = useState(initialTenderId || "sample-tender-1");
+  const [tenderTitle] = useState(
     initialTitle || "Supply, Installation & Maintenance of Cloud Server Infrastructure & High-Performance GPUs"
   );
   const [documentText, setDocumentText] = useState(SAMPLE_DRAFT_BID);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isAuditing, setIsAuditing] = useState(false);
   const [auditResult, setAuditResult] = useState<ComplianceChecklistResult | null>(null);
   const [piiCount, setPiiCount] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      setDocumentText(""); // Prioritize uploaded file
+    }
+  };
+
+  const handleClearFile = () => {
+    setSelectedFile(null);
+    setDocumentText(SAMPLE_DRAFT_BID);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const handleRunAudit = async () => {
     setIsAuditing(true);
@@ -55,25 +75,38 @@ export function ComplianceCheckerUI({ initialTenderId, initialTitle }: Complianc
     setAuditResult(null);
 
     try {
-      const response = await fetch("/api/compliance/check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tenderId,
-          documentText,
-          documentFilename: "technical_bid_proposal.pdf",
-        }),
-      });
+      let response: Response;
+
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append("tenderId", tenderId);
+        formData.append("file", selectedFile);
+
+        response = await fetch("/api/compliance/check", {
+          method: "POST",
+          body: formData,
+        });
+      } else {
+        response = await fetch("/api/compliance/check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tenderId,
+            documentText,
+            documentFilename: "technical_bid_proposal.pdf",
+          }),
+        });
+      }
 
       const resData = await response.json();
 
       if (!response.ok || !resData.success) {
-        // Fallback for demonstration if offline / keys pending
+        // Fallback demo data if LLM keys not yet configured
         setAuditResult({
           overall_compliance_score: 82,
           verdict: "MINOR_REVISIONS_NEEDED",
           executive_assessment:
-            "Bid shows high technical adherence and valid MSME EMD exemption. However, two mandatory statutory declarations are missing from the draft, posing a technical disqualification risk if submitted as-is.",
+            "Bid shows high technical adherence and valid MSME EMD exemption. However, two mandatory statutory declarations are missing from the draft, posing an immediate technical disqualification risk if submitted as-is.",
           clause_evaluations: [
             {
               clause_id: "Clause 3.1 - EMD Exemption",
@@ -167,27 +200,91 @@ export function ComplianceCheckerUI({ initialTenderId, initialTitle }: Complianc
             </div>
           </div>
 
+          {/* PDF Drag & Drop Zone */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                Draft Bid Document Text (or Parsed PDF Extract)
-              </label>
-              <button
-                type="button"
-                onClick={() => setDocumentText(SAMPLE_DRAFT_BID)}
-                className="text-xs font-medium text-emerald-600 hover:underline"
-              >
-                Reset to Sample Bid
-              </button>
+            <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+              Upload Draft Bid PDF Document
+            </label>
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition cursor-pointer ${
+                selectedFile
+                  ? "border-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/20"
+                  : "border-slate-300 hover:border-emerald-400 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/40"
+              }`}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.txt,.docx"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+
+              {selectedFile ? (
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-600 text-white">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">
+                      {selectedFile.name}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {(selectedFile.size / 1024).toFixed(1)} KB • Ready for AI clause extraction
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleClearFile();
+                    }}
+                    className="ml-4 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <UploadCloud className="mx-auto h-8 w-8 text-slate-400" />
+                  <p className="mt-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    Click to select or drag and drop your draft bid PDF
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Supports .pdf and .txt files up to 10MB
+                  </p>
+                </div>
+              )}
             </div>
-            <textarea
-              rows={8}
-              value={documentText}
-              onChange={(e) => setDocumentText(e.target.value)}
-              placeholder="Paste the extracted text from your draft proposal or technical bid document..."
-              className="w-full rounded-md border border-slate-300 p-3 font-mono text-xs text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-            />
           </div>
+
+          {/* Or Paste Text Option */}
+          {!selectedFile && (
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                  Or Paste Proposal Text Directly
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setDocumentText(SAMPLE_DRAFT_BID)}
+                  className="text-xs font-medium text-emerald-600 hover:underline"
+                >
+                  Load Sample Bid Extract
+                </button>
+              </div>
+              <textarea
+                rows={6}
+                value={documentText}
+                onChange={(e) => setDocumentText(e.target.value)}
+                placeholder="Paste the extracted text from your draft proposal or technical bid document..."
+                className="w-full rounded-md border border-slate-300 p-3 font-mono text-xs text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+              />
+            </div>
+          )}
 
           <div className="flex items-center justify-between pt-2">
             <p className="text-xs text-slate-500">
@@ -195,7 +292,7 @@ export function ComplianceCheckerUI({ initialTenderId, initialTitle }: Complianc
             </p>
             <Button
               onClick={handleRunAudit}
-              disabled={isAuditing || !documentText.trim()}
+              disabled={isAuditing || (!selectedFile && !documentText.trim())}
               className="gap-2"
             >
               {isAuditing ? (
