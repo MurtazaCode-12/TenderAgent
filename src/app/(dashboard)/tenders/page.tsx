@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { db } from "@/lib/db/store";
 import { getCurrentUser } from "@/actions/auth";
 import { TenderCard, type TenderCardData } from "@/components/features/tender-card";
@@ -62,47 +62,49 @@ export default async function TendersDiscoveryPage({ searchParams }: DiscoveryPa
     ai_summary: t.ai_summary,
   }));
 
-  // 3. Also merge remote Supabase tenders if active
-  try {
-    const supabase = await createServerSupabaseClient();
-    const { data: remoteTenders } = await (supabase
-      .from("tenders") as any)
-      .select("*, tender_matches(overall_score, ai_summary)")
-      .order("created_at", { ascending: false })
-      .limit(20);
+  // 3. Also merge remote Supabase tenders if actively configured
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = await createServerSupabaseClient();
+      const { data: remoteTenders } = await (supabase
+        .from("tenders") as any)
+        .select("*, tender_matches(overall_score, ai_summary)")
+        .order("created_at", { ascending: false })
+        .limit(20);
 
-    if (remoteTenders && remoteTenders.length > 0) {
-      for (const rt of (remoteTenders as any[])) {
-        if (!masterList.some((t) => t.tender_ref_number === rt.tender_ref_number)) {
-          masterList.push({
-            id: rt.id,
-            portal: rt.portal,
-            tender_ref_number: rt.tender_ref_number,
-            title: rt.title,
-            authority_name: rt.authority_name,
-            category: rt.category,
-            estimated_value: rt.estimated_value,
-            emd_amount: rt.emd_amount,
-            submission_deadline: rt.submission_deadline,
-            published_date: rt.published_date,
-            opening_date: rt.opening_date,
-            direct_portal_url: rt.original_document_urls?.[0] || `https://bidplus.gem.gov.in/all-bids`,
-            original_document_urls: rt.original_document_urls || [],
-            raw_payload: rt.raw_payload || {},
-            match_score: rt.tender_matches?.[0]?.overall_score || 88,
-            ai_summary: rt.tender_matches?.[0]?.ai_summary?.executive_summary
-              ? rt.tender_matches[0].ai_summary
-              : {
-                  executive_summary: rt.description || "Active government procurement opportunity.",
-                  bid_go_no_go_recommendation: "STRONG_BID",
-                  recommendation_rationale: "Matched to contractor profile.",
-                },
-          });
+      if (remoteTenders && remoteTenders.length > 0) {
+        for (const rt of (remoteTenders as any[])) {
+          if (!masterList.some((t) => t.tender_ref_number === rt.tender_ref_number)) {
+            masterList.push({
+              id: rt.id,
+              portal: rt.portal,
+              tender_ref_number: rt.tender_ref_number,
+              title: rt.title,
+              authority_name: rt.authority_name,
+              category: rt.category,
+              estimated_value: rt.estimated_value,
+              emd_amount: rt.emd_amount,
+              submission_deadline: rt.submission_deadline,
+              published_date: rt.published_date,
+              opening_date: rt.opening_date,
+              direct_portal_url: rt.original_document_urls?.[0] || `https://bidplus.gem.gov.in/all-bids`,
+              original_document_urls: rt.original_document_urls || [],
+              raw_payload: rt.raw_payload || {},
+              match_score: rt.tender_matches?.[0]?.overall_score || 88,
+              ai_summary: rt.tender_matches?.[0]?.ai_summary?.executive_summary
+                ? rt.tender_matches[0].ai_summary
+                : {
+                    executive_summary: rt.description || "Active government procurement opportunity.",
+                    bid_go_no_go_recommendation: "STRONG_BID",
+                    recommendation_rationale: "Matched to contractor profile.",
+                  },
+            });
+          }
         }
       }
+    } catch (err) {
+      console.warn("[TendersPage] Remote Supabase fetch skipped:", err);
     }
-  } catch (err) {
-    // Non-blocking fallback
   }
 
   // 4. Client-side search & multi-trade filter enforcement

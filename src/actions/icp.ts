@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { db } from "@/lib/db/store";
 import { getCurrentUser } from "@/actions/auth";
 import { generateEmbedding } from "@/lib/ai/config";
@@ -67,30 +67,32 @@ export async function saveICPAction(formData: FormData): Promise<SaveICPResult> 
       console.warn("[ICP Embedding Generation Warning]: AI embedding unavailable, falling back to keyword heuristics", err);
     }
 
-    // 3. Upsert into Supabase if connected
-    try {
-      const supabase = await createServerSupabaseClient();
-      await (supabase.from("company_icps") as any).upsert(
-        {
-          company_id: companyId,
-          title: icpData.title,
-          target_categories: icpData.target_categories,
-          min_tender_value: icpData.min_tender_value,
-          max_tender_value: icpData.max_tender_value,
-          preferred_states: icpData.preferred_states,
-          excluded_keywords: icpData.excluded_keywords,
-          required_certifications: icpData.required_certifications,
-          min_annual_turnover: icpData.min_annual_turnover,
-          max_emd_capacity: icpData.max_emd_capacity,
-          icp_summary: icpData.icp_summary,
-          embedding: embeddingVector ? JSON.stringify(embeddingVector) : null,
-          is_active: true,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "company_id" }
-      );
-    } catch (sbErr) {
-      // Non-blocking
+    // 3. Upsert into Supabase if actively configured
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = await createServerSupabaseClient();
+        await (supabase.from("company_icps") as any).upsert(
+          {
+            company_id: companyId,
+            title: icpData.title,
+            target_categories: icpData.target_categories,
+            min_tender_value: icpData.min_tender_value,
+            max_tender_value: icpData.max_tender_value,
+            preferred_states: icpData.preferred_states,
+            excluded_keywords: icpData.excluded_keywords,
+            required_certifications: icpData.required_certifications,
+            min_annual_turnover: icpData.min_annual_turnover,
+            max_emd_capacity: icpData.max_emd_capacity,
+            icp_summary: icpData.icp_summary,
+            embedding: embeddingVector ? JSON.stringify(embeddingVector) : null,
+            is_active: true,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "company_id" }
+        );
+      } catch (sbErr) {
+        // Non-blocking
+      }
     }
 
     revalidatePath("/settings");

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { db } from "@/lib/db/store";
 import { getCurrentUser } from "@/actions/auth";
 import type { PipelineStage } from "@/types";
@@ -29,21 +29,23 @@ export async function saveToPipelineAction(
     // 1. Save in Database Store
     db.savePipelineItem(companyId, tenderId, stage, notes);
 
-    // 2. Also upsert in Supabase if connected
-    try {
-      const supabase = await createServerSupabaseClient();
-      await (supabase.from("pipeline_items") as any).upsert(
-        {
-          company_id: companyId,
-          tender_id: tenderId,
-          stage,
-          assigned_user_id: userId,
-          internal_notes: notes,
-        },
-        { onConflict: "company_id,tender_id" }
-      );
-    } catch (sbErr) {
-      // Non-blocking
+    // 2. Also upsert in Supabase if actively configured
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = await createServerSupabaseClient();
+        await (supabase.from("pipeline_items") as any).upsert(
+          {
+            company_id: companyId,
+            tender_id: tenderId,
+            stage,
+            assigned_user_id: userId,
+            internal_notes: notes,
+          },
+          { onConflict: "company_id,tender_id" }
+        );
+      } catch (sbErr) {
+        // Non-blocking
+      }
     }
 
     revalidatePath("/tenders");
@@ -65,14 +67,16 @@ export async function updatePipelineStageAction(
   try {
     db.updatePipelineStage(pipelineItemId, newStage);
 
-    try {
-      const supabase = await createServerSupabaseClient();
-      await (supabase
-        .from("pipeline_items") as any)
-        .update({ stage: newStage, updated_at: new Date().toISOString() })
-        .eq("id", pipelineItemId);
-    } catch (sbErr) {
-      // Non-blocking
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = await createServerSupabaseClient();
+        await (supabase
+          .from("pipeline_items") as any)
+          .update({ stage: newStage, updated_at: new Date().toISOString() })
+          .eq("id", pipelineItemId);
+      } catch (sbErr) {
+        // Non-blocking
+      }
     }
 
     revalidatePath("/pipeline");
@@ -92,14 +96,16 @@ export async function dismissFromPipelineAction(
   try {
     db.updatePipelineStage(pipelineItemId, "passed");
 
-    try {
-      const supabase = await createServerSupabaseClient();
-      await (supabase
-        .from("pipeline_items") as any)
-        .update({ stage: "passed", updated_at: new Date().toISOString() })
-        .eq("id", pipelineItemId);
-    } catch (sbErr) {
-      // Non-blocking
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = await createServerSupabaseClient();
+        await (supabase
+          .from("pipeline_items") as any)
+          .update({ stage: "passed", updated_at: new Date().toISOString() })
+          .eq("id", pipelineItemId);
+      } catch (sbErr) {
+        // Non-blocking
+      }
     }
 
     revalidatePath("/pipeline");
@@ -121,18 +127,20 @@ export async function updatePipelineNotesAction(
   try {
     db.updatePipelineNotes(pipelineItemId, notes);
 
-    try {
-      const supabase = await createServerSupabaseClient();
-      await (supabase
-        .from("pipeline_items") as any)
-        .update({
-          internal_notes: notes,
-          bid_value: bidValue || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", pipelineItemId);
-    } catch (sbErr) {
-      // Non-blocking
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = await createServerSupabaseClient();
+        await (supabase
+          .from("pipeline_items") as any)
+          .update({
+            internal_notes: notes,
+            bid_value: bidValue || null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", pipelineItemId);
+      } catch (sbErr) {
+        // Non-blocking
+      }
     }
 
     revalidatePath("/pipeline");

@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db/store";
 import { searchLiveGovernmentTenders } from "@/lib/ingestion/search";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
 export interface AuthActionResult {
   success?: boolean;
@@ -79,43 +79,45 @@ export async function registerContractorProfile(formData: FormData): Promise<Aut
     });
 
     // 2. Also register in Supabase if active
-    try {
-      const supabase = await createServerSupabaseClient();
-      const { data: sbAuth } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (sbAuth.user) {
-        await (supabase.from("companies") as any).insert({
-          id: company.id,
-          name: companyName,
-          legal_name: companyName,
-        });
-
-        await (supabase.from("profiles") as any).insert({
-          id: sbAuth.user.id,
-          company_id: company.id,
-          full_name: fullName,
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = await createServerSupabaseClient();
+        const { data: sbAuth } = await supabase.auth.signUp({
           email,
-          phone_number: phoneNumber,
-          role: "owner",
-          whatsapp_notifications_enabled: true,
+          password,
         });
 
-        await (supabase.from("company_icps") as any).insert({
-          company_id: company.id,
-          title: icp.title,
-          target_categories: icp.target_categories,
-          min_tender_value: icp.min_tender_value,
-          max_tender_value: icp.max_tender_value,
-          preferred_states: icp.preferred_states,
-          required_certifications: icp.required_certifications,
-          icp_summary: icp.icp_summary,
-        });
+        if (sbAuth.user) {
+          await (supabase.from("companies") as any).insert({
+            id: company.id,
+            name: companyName,
+            legal_name: companyName,
+          });
+
+          await (supabase.from("profiles") as any).insert({
+            id: sbAuth.user.id,
+            company_id: company.id,
+            full_name: fullName,
+            email,
+            phone_number: phoneNumber,
+            role: "owner",
+            whatsapp_notifications_enabled: true,
+          });
+
+          await (supabase.from("company_icps") as any).insert({
+            company_id: company.id,
+            title: icp.title,
+            target_categories: icp.target_categories,
+            min_tender_value: icp.min_tender_value,
+            max_tender_value: icp.max_tender_value,
+            preferred_states: icp.preferred_states,
+            required_certifications: icp.required_certifications,
+            icp_summary: icp.icp_summary,
+          });
+        }
+      } catch (sbErr) {
+        // Non-blocking fallback
       }
-    } catch (sbErr) {
-      // Non-blocking fallback
     }
 
     // 3. Establish persistent HTTP-only session cookie
@@ -181,19 +183,21 @@ export async function signInAction(formData: FormData): Promise<AuthActionResult
     redirect("/tenders");
   }
 
-  // 2. Check Supabase
-  try {
-    const supabase = await createServerSupabaseClient();
-    const { error: sbErr } = await supabase.auth.signInWithPassword({
-      email: identifier,
-      password,
-    });
+  // 2. Check Supabase if actively configured
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = await createServerSupabaseClient();
+      const { error: sbErr } = await supabase.auth.signInWithPassword({
+        email: identifier,
+        password,
+      });
 
-    if (!sbErr) {
-      redirect("/tenders");
+      if (!sbErr) {
+        redirect("/tenders");
+      }
+    } catch (err) {
+      // fall through
     }
-  } catch (err) {
-    // fall through
   }
 
   return { error: "No account found with these credentials. Please check your spelling or register a new profile." };

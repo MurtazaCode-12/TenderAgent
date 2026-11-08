@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useTransition } from "react";
+import React, { useState, useEffect, useTransition, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Search, X, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Search, X, Loader2 } from "lucide-react";
 import { CONTRACTOR_TRADES } from "@/types";
 
 export function TenderFilters() {
@@ -15,44 +15,85 @@ export function TenderFilters() {
   const currentPortal = searchParams.get("portal") || "all";
   const currentCategory = searchParams.get("category") || "all";
 
-  const updateParam = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value && value !== "all") {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
+  // Local state for smooth, unblocked typing
+  const [searchVal, setSearchVal] = useState(currentQuery);
 
-    startTransition(() => {
-      router.push(`${pathname}?${params.toString()}`);
-    });
+  // Sync if URL changes externally
+  useEffect(() => {
+    setSearchVal(currentQuery);
+  }, [currentQuery]);
+
+  const pushParams = useCallback(
+    (updates: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value && value !== "all") {
+          params.set(key, value);
+        } else {
+          params.delete(key);
+        }
+      });
+
+      startTransition(() => {
+        router.push(`${pathname}?${params.toString()}`);
+      });
+    },
+    [router, pathname, searchParams]
+  );
+
+  // Debounce search input by 280ms
+  useEffect(() => {
+    if (searchVal === currentQuery) return;
+
+    const timer = setTimeout(() => {
+      pushParams({ query: searchVal.trim() });
+    }, 280);
+
+    return () => clearTimeout(timer);
+  }, [searchVal, currentQuery, pushParams]);
+
+  const handlePortalChange = (portalId: string) => {
+    pushParams({ portal: portalId });
+  };
+
+  const handleCategoryChange = (categoryId: string) => {
+    pushParams({ category: categoryId });
   };
 
   const clearAllFilters = () => {
+    setSearchVal("");
     startTransition(() => {
       router.push(pathname);
     });
   };
 
-  const hasActiveFilters = currentQuery || currentPortal !== "all" || currentCategory !== "all";
+  const hasActiveFilters = Boolean(currentQuery || currentPortal !== "all" || currentCategory !== "all");
 
   return (
-    <div className="rounded-2xl border border-slate-200/90 bg-white p-3.5 sm:p-4 shadow-2xs space-y-3">
+    <div className="relative rounded-2xl border border-slate-200/90 bg-white p-3 sm:p-4 shadow-2xs space-y-3">
+      {/* Top Transition Progress Bar */}
+      {isPending && (
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-500 animate-pulse rounded-t-2xl" />
+      )}
+
       {/* Row 1: Search Bar & Segmented Portal Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2.5">
-        {/* Search Input */}
+        {/* Instant Response Search Input */}
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            defaultValue={currentQuery}
+            value={searchVal}
             placeholder="Search tenders by authority (AIIMS, PWD, NHAI), ref ID, or scope..."
-            onChange={(e) => updateParam("query", e.target.value)}
+            onChange={(e) => setSearchVal(e.target.value)}
             className="w-full h-10 rounded-xl border border-slate-200 bg-slate-50/70 pl-9 pr-8 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition"
           />
-          {currentQuery && (
+          {searchVal && (
             <button
-              onClick={() => updateParam("query", "")}
+              onClick={() => {
+                setSearchVal("");
+                pushParams({ query: null });
+              }}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
               aria-label="Clear search"
             >
@@ -62,7 +103,7 @@ export function TenderFilters() {
         </div>
 
         {/* Compact Segmented Portal Filter */}
-        <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 border border-slate-200/60 overflow-x-auto">
+        <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 border border-slate-200/60 overflow-x-auto shrink-0">
           {[
             { id: "all", label: "All Portals" },
             { id: "gem", label: "GeM" },
@@ -71,7 +112,7 @@ export function TenderFilters() {
           ].map((portal) => (
             <button
               key={portal.id}
-              onClick={() => updateParam("portal", portal.id)}
+              onClick={() => handlePortalChange(portal.id)}
               className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all ${
                 currentPortal === portal.id
                   ? "bg-white text-slate-900 shadow-2xs"
@@ -90,7 +131,7 @@ export function TenderFilters() {
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin flex-1">
           <button
             type="button"
-            onClick={() => updateParam("category", "all")}
+            onClick={() => handleCategoryChange("all")}
             className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold whitespace-nowrap transition-all ${
               currentCategory === "all"
                 ? "bg-slate-900 text-white shadow-2xs"
@@ -107,7 +148,7 @@ export function TenderFilters() {
               <button
                 key={trade.id}
                 type="button"
-                onClick={() => updateParam("category", trade.id)}
+                onClick={() => handleCategoryChange(trade.id)}
                 className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold whitespace-nowrap transition-all ${
                   isSelected
                     ? "bg-emerald-600 text-white shadow-2xs"

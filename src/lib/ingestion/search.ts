@@ -2,7 +2,7 @@ import { db, type DBTender } from "@/lib/db/store";
 import { GemPortalConnector } from "./connectors/gem";
 import { CpppPortalConnector } from "./connectors/cppp";
 import { StatePortalConnector } from "./connectors/state";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import crypto from "crypto";
 
 export interface IndustrySearchProfile {
@@ -115,31 +115,33 @@ export async function searchLiveGovernmentTenders(
   // 3. Upsert into local database
   db.upsertTenders(liveTenders);
 
-  // 4. Also upsert into Supabase if connected
-  try {
-    const supabase = await createServerSupabaseClient();
-    for (const tender of liveTenders.slice(0, 10)) {
-      await (supabase.from("tenders") as any).upsert(
-        {
-          portal: tender.portal,
-          tender_ref_number: tender.tender_ref_number,
-          title: tender.title,
-          authority_name: tender.authority_name,
-          category: tender.category,
-          location_state: tender.location_state,
-          estimated_value: tender.estimated_value,
-          emd_amount: tender.emd_amount,
-          published_date: tender.published_date,
-          submission_deadline: tender.submission_deadline,
-          original_document_urls: tender.original_document_urls,
-          raw_payload: tender.raw_payload,
-          status: "active",
-        },
-        { onConflict: "tender_ref_number" }
-      );
+  // 4. Also upsert into Supabase if actively configured
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = await createServerSupabaseClient();
+      for (const tender of liveTenders.slice(0, 10)) {
+        await (supabase.from("tenders") as any).upsert(
+          {
+            portal: tender.portal,
+            tender_ref_number: tender.tender_ref_number,
+            title: tender.title,
+            authority_name: tender.authority_name,
+            category: tender.category,
+            location_state: tender.location_state,
+            estimated_value: tender.estimated_value,
+            emd_amount: tender.emd_amount,
+            published_date: tender.published_date,
+            submission_deadline: tender.submission_deadline,
+            original_document_urls: tender.original_document_urls,
+            raw_payload: tender.raw_payload,
+            status: "active",
+          },
+          { onConflict: "tender_ref_number" }
+        );
+      }
+    } catch (err) {
+      // Non-blocking fallback
     }
-  } catch (err) {
-    // Non-blocking fallback
   }
 
   return {
