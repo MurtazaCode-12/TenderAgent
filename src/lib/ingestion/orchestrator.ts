@@ -1,101 +1,139 @@
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { GemPortalScraper, CpppPortalScraper, StatePortalScraper } from "./scrapers";
+import { GemPortalConnector } from "./connectors/gem";
+import { CpppPortalConnector } from "./connectors/cppp";
+import { StatePortalConnector } from "./connectors/state";
+import { ScrapedTenderValidationSchema, type ValidatedScrapedTender } from "./validation";
 import { generateEmbedding } from "@/lib/ai/config";
 import { evaluateTenderICPMatch } from "@/lib/ai/matcher";
 import { summarizeTender } from "@/lib/ai/summarizer";
 import { sendWhatsAppTenderAlert } from "@/lib/whatsapp/client";
-import type { IngestionResult, RawScrapedTender } from "./types";
 import type { CompanyICPRow, TenderRow } from "@/types";
 
+export interface ProductionIngestionMetrics {
+  totalCrawled: number;
+  totalValidated: number;
+  newTendersInserted: number;
+  duplicatesSkipped: number;
+  highMatchNotificationsDispatched: number;
+  quarantinedErrors: Array<{
+    portal: string;
+    tenderRef: string;
+    reason: string;
+  }>;
+  executionTimeMs: number;
+}
+
 /**
- * Enterprise Ingestion Orchestrator
- * Ingests tenders from public portals, embeds text via AI, matches against contractor ICPs,
- * triggers structured summaries for high-value fits (Score > 80%), and dispatches WhatsApp alerts.
+ * Enterprise Multi-Portal Ingestion Orchestrator
+ * Crawls GeM, CPPP, and State Portals, validates through Zod, deduplicates,
+ * computes 1536-dim vector embeddings, and triggers AI semantic matching.
  */
-export async function runIngestionPipeline(): Promise<IngestionResult> {
+export async function runIngestionPipeline(): Promise<ProductionIngestionMetrics> {
+  const startTime = Date.now();
   const supabase = createAdminSupabaseClient();
-  const scrapers = [
-    new GemPortalScraper(),
-    new CpppPortalScraper(),
-    new StatePortalScraper(),
+
+  const connectors = [
+    new GemPortalConnector(),
+    new CpppPortalConnector(),
+    new StatePortalConnector(),
   ];
 
-  const result: IngestionResult = {
-    totalScraped: 0,
+  const metrics: ProductionIngestionMetrics = {
+    totalCrawled: 0,
+    totalValidated: 0,
     newTendersInserted: 0,
-    duplicateTendersSkipped: 0,
-    errors: [],
+    duplicatesSkipped: 0,
+    highMatchNotificationsDispatched: 0,
+    quarantinedErrors: [],
+    executionTimeMs: 0,
   };
 
-  // 1. Fetch active company ICPs along with contractor phone numbers
+  // 1. Fetch active company ICPs and recipient phone numbers
   const { data: icpData, error: icpError } = await supabase
     .from("company_icps")
     .select("*, companies!inner(id, name, profiles(id, phone_number, full_name, whatsapp_notifications_enabled))")
     .eq("is_active", true);
 
   if (icpError) {
-    console.error("[runIngestionPipeline] Failed to fetch company ICPs:", icpError);
-    throw icpError;
+    console.error("[IngestionPipeline] Failed to fetch active ICPs:", icpError);
   }
 
-  // 2. Fetch raw tenders from all portal connectors
-  const rawTenders: RawScrapedTender[] = [];
-  for (const scraper of scrapers) {
+  // 2. Crawl and Validate from all portal connectors
+  const validatedBatch: ValidatedScrapedTender[] = [];
+
+  for (const connector of connectors) {
     try {
-      const portalTenders = await scraper.fetchLatestTenders();
-      rawTenders.push(...portalTenders);
-    } catch (scraperErr) {
-      console.error(`[Scraper Error: ${scraper.portalName}]:`, scraperErr);
+      const portalTenders = await connector.fetchLatestTenders();
+      metrics.totalCrawled += portalTenders.length;
+
+      for (const item of portalTenders) {
+        const validation = ScrapedTenderValidationSchema.safeParse(item);
+        if (validation.success) {
+          validatedBatch.push(validation.data);
+          metrics.totalValidated++;
+        } else {
+          metrics.quarantinedErrors.push({
+            portal: connector.portalName,
+            tenderRef: item.tenderRefNumber || "UNKNOWN_REF",
+            reason: validation.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join("; "),
+          });
+        }
+      }
+    } catch (portalErr) {
+      console.error(`[IngestionPipeline] Connector error for ${connector.portalName}:`, portalErr);
+      metrics.quarantinedErrors.push({
+        portal: connector.portalName,
+        tenderRef: "CONNECTOR_FAULT",
+        reason: portalErr instanceof Error ? portalErr.message : "Unknown portal error",
+      });
     }
   }
 
-  result.totalScraped = rawTenders.length;
-
-  // 3. Process each tender
-  for (const raw of rawTenders) {
+  // 3. Process Validated Tenders (Deduplication + Embedding + Storage)
+  for (const tender of validatedBatch) {
     try {
-      // Check if tender already exists in Supabase
+      // Deduplication check by unique tender reference number
       const { data: existing } = await supabase
         .from("tenders")
-        .select("id")
-        .eq("tender_ref_number", raw.tenderRefNumber)
+        .select("id, status")
+        .eq("tender_ref_number", tender.tenderRefNumber)
         .maybeSingle();
 
       if (existing) {
-        result.duplicateTendersSkipped++;
+        metrics.duplicatesSkipped++;
         continue;
       }
 
-      // Generate vector embedding for semantic matching
-      const textToEmbed = `${raw.title}. Category: ${raw.category}. Department: ${raw.authorityName}. Location: ${raw.locationState || "All India"}. Description: ${raw.description || ""}`;
+      // Generate 1536-dimensional vector embedding for semantic search
       let embeddingVector: number[] | null = null;
       try {
-        embeddingVector = await generateEmbedding(textToEmbed);
+        const textForEmbedding = `${tender.title}. Category: ${tender.category}. Issuing Department: ${tender.authorityName}. State: ${tender.locationState || "All India"}. Description: ${tender.description || ""}`;
+        embeddingVector = await generateEmbedding(textForEmbedding);
       } catch (embErr) {
-        console.warn(`[Embedding warning for ${raw.tenderRefNumber}]:`, embErr);
+        console.warn(`[Embedding warning for ${tender.tenderRefNumber}]:`, embErr);
       }
 
-      // Insert tender into Supabase
+      // Insert clean record into Supabase
       const { data: insertedTender, error: insertErr } = await supabase
         .from("tenders")
         .insert({
-          portal: raw.portal,
-          tender_ref_number: raw.tenderRefNumber,
-          title: raw.title,
-          description: raw.description,
-          category: raw.category,
-          authority_name: raw.authorityName,
-          location_state: raw.locationState,
-          location_city: raw.locationCity,
-          estimated_value: raw.estimatedValue,
-          emd_amount: raw.emdAmount,
-          document_fee: raw.documentFee,
-          published_date: raw.publishedDate,
-          pre_bid_meeting_date: raw.preBidMeetingDate,
-          submission_deadline: raw.submissionDeadline,
-          opening_date: raw.openingDate,
-          original_document_urls: raw.originalDocumentUrls || [],
-          raw_payload: raw.rawPayload,
+          portal: tender.portal,
+          tender_ref_number: tender.tenderRefNumber,
+          title: tender.title,
+          description: tender.description || "",
+          category: tender.category,
+          authority_name: tender.authorityName,
+          location_state: tender.locationState,
+          location_city: tender.locationCity,
+          estimated_value: tender.estimatedValue,
+          emd_amount: tender.emdAmount,
+          document_fee: tender.documentFee,
+          published_date: tender.publishedDate,
+          pre_bid_meeting_date: tender.preBidMeetingDate,
+          submission_deadline: tender.submissionDeadline,
+          opening_date: tender.openingDate,
+          original_document_urls: tender.originalDocumentUrls,
+          raw_payload: tender.rawPayload,
           embedding: embeddingVector ? JSON.stringify(embeddingVector) : null,
           status: "active",
         })
@@ -103,20 +141,21 @@ export async function runIngestionPipeline(): Promise<IngestionResult> {
         .single();
 
       if (insertErr || !insertedTender) {
-        result.errors.push({
-          tenderRef: raw.tenderRefNumber,
-          error: insertErr?.message || "Failed to insert tender record",
+        metrics.quarantinedErrors.push({
+          portal: tender.portal,
+          tenderRef: tender.tenderRefNumber,
+          reason: insertErr?.message || "Failed to insert into Supabase",
         });
         continue;
       }
 
-      result.newTendersInserted++;
-      const tenderRow = insertedTender as TenderRow;
+      metrics.newTendersInserted++;
+      const savedTender = insertedTender as TenderRow;
 
-      // 4. Match against all registered company ICPs
+      // 4. Semantic ICP Matching & WhatsApp SDR Triggering
       if (icpData && icpData.length > 0) {
-        for (const item of icpData) {
-          const icp = item as CompanyICPRow & {
+        for (const rawIcp of icpData) {
+          const icp = rawIcp as CompanyICPRow & {
             companies: {
               id: string;
               name: string;
@@ -131,37 +170,36 @@ export async function runIngestionPipeline(): Promise<IngestionResult> {
 
           const icpEmbedding = icp.embedding ? JSON.parse(icp.embedding) : undefined;
           const matchResult = evaluateTenderICPMatch(
-            tenderRow,
+            savedTender,
             icp,
             embeddingVector || undefined,
             icpEmbedding
           );
 
-          // Only process and notify if overall score > 80% (per architectural requirement)
+          // Trigger plain-language summary and WhatsApp SDR alert when match >= 80%
           if (matchResult.overallScore >= 80) {
-            // Generate structured executive summary via LLM
             let aiSummaryJson = {};
             try {
               aiSummaryJson = await summarizeTender({
-                tenderRefNumber: tenderRow.tender_ref_number,
-                title: tenderRow.title,
-                authorityName: tenderRow.authority_name,
-                category: tenderRow.category,
-                description: tenderRow.description || "",
-                estimatedValue: tenderRow.estimated_value,
-                locationState: tenderRow.location_state,
-                rawPayload: raw.rawPayload,
+                tenderRefNumber: savedTender.tender_ref_number,
+                title: savedTender.title,
+                authorityName: savedTender.authority_name,
+                category: savedTender.category,
+                description: savedTender.description || "",
+                estimatedValue: savedTender.estimated_value,
+                locationState: savedTender.location_state,
+                rawPayload: tender.rawPayload,
               });
             } catch (sumErr) {
-              console.error(`[Summary Error for ${tenderRow.tender_ref_number}]:`, sumErr);
+              console.warn(`[Summary AI Warning for ${savedTender.tender_ref_number}]:`, sumErr);
             }
 
-            // Insert into tender_matches
-            const { data: matchRecord, error: matchInsertErr } = await supabase
+            // Save match record in database
+            const { data: matchRecord } = await supabase
               .from("tender_matches")
               .insert({
                 company_id: icp.company_id,
-                tender_id: tenderRow.id,
+                tender_id: savedTender.id,
                 overall_score: matchResult.overallScore,
                 semantic_score: matchResult.semanticScore,
                 rule_score: matchResult.ruleScore,
@@ -170,35 +208,31 @@ export async function runIngestionPipeline(): Promise<IngestionResult> {
                 ai_summary: aiSummaryJson,
                 whatsapp_status: "queued",
               })
-              .select()
-              .single();
+              .select("id")
+              .maybeSingle();
 
-            if (matchInsertErr) {
-              console.error("[Match Insert Error]:", matchInsertErr);
-              continue;
-            }
-
-            // 5. Send WhatsApp SDR alert to eligible company bid managers
-            const primaryRecipient = icp.companies.profiles.find(
+            // Dispatch WhatsApp SDR interactive alert to bid manager
+            const recipient = icp.companies.profiles.find(
               (p) => p.whatsapp_notifications_enabled && p.phone_number
             );
 
-            if (primaryRecipient) {
+            if (recipient) {
               try {
                 const sendResult = await sendWhatsAppTenderAlert({
-                  to: primaryRecipient.phone_number,
+                  to: recipient.phone_number,
                   companyId: icp.company_id,
-                  tenderId: tenderRow.id,
-                  tenderRefNumber: tenderRow.tender_ref_number,
-                  title: tenderRow.title,
-                  authorityName: tenderRow.authority_name,
-                  estimatedValue: tenderRow.estimated_value,
-                  submissionDeadline: tenderRow.submission_deadline,
+                  tenderId: savedTender.id,
+                  tenderRefNumber: savedTender.tender_ref_number,
+                  title: savedTender.title,
+                  authorityName: savedTender.authority_name,
+                  estimatedValue: savedTender.estimated_value,
+                  submissionDeadline: savedTender.submission_deadline,
                   matchScore: matchResult.overallScore,
                   aiSummary: aiSummaryJson,
                 });
 
-                if (sendResult.success) {
+                if (sendResult.success && matchRecord) {
+                  metrics.highMatchNotificationsDispatched++;
                   await supabase
                     .from("tender_matches")
                     .update({
@@ -208,19 +242,21 @@ export async function runIngestionPipeline(): Promise<IngestionResult> {
                     .eq("id", matchRecord.id);
                 }
               } catch (waErr) {
-                console.error(`[WhatsApp Dispatch Error for ${tenderRow.tender_ref_number}]:`, waErr);
+                console.warn("[WhatsApp SDR dispatch warning]:", waErr);
               }
             }
           }
         }
       }
-    } catch (itemErr) {
-      result.errors.push({
-        tenderRef: raw.tenderRefNumber,
-        error: itemErr instanceof Error ? itemErr.message : "Unexpected error",
+    } catch (procErr) {
+      metrics.quarantinedErrors.push({
+        portal: tender.portal,
+        tenderRef: tender.tenderRefNumber,
+        reason: procErr instanceof Error ? procErr.message : "Processing exception",
       });
     }
   }
 
-  return result;
+  metrics.executionTimeMs = Date.now() - startTime;
+  return metrics;
 }
