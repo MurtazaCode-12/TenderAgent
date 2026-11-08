@@ -39,6 +39,8 @@ export async function middleware(request: NextRequest) {
   const isDashboardRoute =
     pathname === "/" ||
     pathname.startsWith("/tenders") ||
+    pathname.startsWith("/draft-bid") ||
+    pathname.startsWith("/whatsapp-demo") ||
     pathname.startsWith("/pipeline") ||
     pathname.startsWith("/compliance") ||
     pathname.startsWith("/settings");

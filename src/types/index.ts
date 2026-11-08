@@ -165,3 +165,102 @@ export interface ApiResponse<T = unknown> {
   };
   timestamp: string;
 }
+
+
+// ============================================================================
+// Universal Contractor Trades Catalog (All Trades Coverage)
+// ============================================================================
+
+export interface ContractorTradeInfo {
+  id: string;
+  label: string;
+  shortLabel: string;
+  icon: string;
+  categoryName: string;
+  qualTag: string;
+  description: string;
+  mandatoryDocs: string[];
+}
+
+export const CONTRACTOR_TRADES: ContractorTradeInfo[] = [
+  {
+    id: "civil",
+    label: "Civil & Infrastructure",
+    shortLabel: "Civil & Infra",
+    icon: "🏗️",
+    categoryName: "Civil Infrastructure & Works",
+    qualTag: "PWD Class 1-A & Hot-Mix",
+    description: "Highways, Bridges, PWD Buildings, Bituminous Overlay, Stormwater Drainage",
+    mandatoryDocs: ["PWD/CPWD Class Registration", "Batch Mix Plant Ownership/Lease", "Bank Solvency Certificate"],
+  },
+  {
+    id: "electrical_solar",
+    label: "Electrical & Solar Power",
+    shortLabel: "Electrical & Solar",
+    icon: "☀️",
+    categoryName: "Electrical & Solar Power",
+    qualTag: "MNRE ALMM & Class-1 CEA",
+    description: "Rooftop Solar PV, 132/33kV Substations, Smart LED Lighting, Transformers",
+    mandatoryDocs: ["MNRE ALMM Module Compliance", "Class-1 Electrical Inspectorate License", "Discom Net-Metering Empanelment"],
+  },
+  {
+    id: "it_software",
+    label: "IT, Software & Cloud",
+    shortLabel: "IT & Software",
+    icon: "💻",
+    categoryName: "Information Technology & Software",
+    qualTag: "OEM MAF & CMMI Level 3+",
+    description: "Cloud Compute, H100 AI Nodes, HIMS Health Software, Networking & Cyber AMC",
+    mandatoryDocs: ["OEM Manufacturer Authorization Form (MAF)", "CMMI Level 3/5 Certificate", "ISO 27001 Information Security"],
+  },
+  {
+    id: "healthcare",
+    label: "Healthcare & Medical Devices",
+    shortLabel: "Healthcare & Pharma",
+    icon: "🏥",
+    categoryName: "Healthcare & Medical Equipment",
+    qualTag: "CDSCO Form 20B/21B & CE/FDA",
+    description: "AIIMS ICU Telemetry, Digital Radiology, Oncology Medicines, Lab Analyzers",
+    mandatoryDocs: ["CDSCO Wholesale Drug License", "US FDA / European CE Clearance", "Cold-Chain Logistics Declaration"],
+  },
+  {
+    id: "facility_security",
+    label: "Facility & Security Services",
+    shortLabel: "Facility & Security",
+    icon: "👮",
+    categoryName: "Facility Management & Security",
+    qualTag: "PSARA License & Min. Wages",
+    description: "Armed PSU Security, Airport Mechanized Housekeeping, Pest Control, Station Staff",
+    mandatoryDocs: ["State PSARA License", "EPFO & ESIC Compliance Statement", "Minimum Wages Act 1948 Undertaking"],
+  },
+  {
+    id: "fleet_logistics",
+    label: "Fleet, Transport & Logistics",
+    shortLabel: "Fleet & Transport",
+    icon: "🚚",
+    categoryName: "Fleet, Transport & Logistics",
+    qualTag: "AIS-140 GPS & Commercial RTO",
+    description: "Electric Transit Buses, Reefer Container Freight, Heavy Commercial Haulage",
+    mandatoryDocs: ["AIS-140 GPS Telematics Certificate", "Commercial RTO Fleet Permits & PUC", "Carrier Legal Liability Insurance"],
+  },
+  {
+    id: "telecom",
+    label: "Telecom & Optical Fiber",
+    shortLabel: "Telecom & OFC",
+    icon: "📡",
+    categoryName: "Telecommunications & Networking",
+    qualTag: "DoT IP-1 & HDD Boring Rig",
+    description: "RailTel OFC Laying, BharatNet GPON Broadband, Aerial ADSS Fiber Splicing",
+    mandatoryDocs: ["DoT IP-1 Infrastructure Registration", "Trenchless HDD Boring Rig Schedule", "OTDR Calibration & Splicing Report"],
+  },
+  {
+    id: "general_supplies",
+    label: "General Goods & MSME Supplies",
+    shortLabel: "MSME & Goods",
+    icon: "📦",
+    categoryName: "General Goods & MSME Supplies",
+    qualTag: "Make in India Class-1 (>50%)",
+    description: "School Desks & Almirahs, Combat Uniforms, HDPE Submersible Pumps, DI Pipes",
+    mandatoryDocs: ["Udyam MSME Registration Certificate", "MII Class-1 Local Content (>50%) Self-Declaration", "BIS / ISI Product Certification"],
+  },
+];

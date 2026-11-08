@@ -11,8 +11,9 @@ import {
   Inbox,
   CheckCircle2,
   Building2,
-  Globe,
-  Briefcase,
+  FileText,
+  Smartphone,
+  ShieldCheck,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -36,7 +37,7 @@ export default async function TendersDiscoveryPage({ searchParams }: DiscoveryPa
   // 1. Get current logged in contractor profile
   const currentUser = await getCurrentUser();
   const companyName = currentUser?.company?.name || currentUser?.user?.company_name || "Apex Infotech";
-  const targetTrade = currentUser?.icp?.target_categories?.[0] || "Information Technology & Software";
+  const targetTrade = currentUser?.icp?.target_categories?.[0] || "All Contractor Trades";
 
   // 2. Fetch tenders from connected Database Store
   const dbTenders = db.getAllTenders({
@@ -107,7 +108,7 @@ export default async function TendersDiscoveryPage({ searchParams }: DiscoveryPa
     // Non-blocking fallback
   }
 
-  // 4. Client-side search & filter enforcement
+  // 4. Client-side search & multi-trade filter enforcement
   const filteredTenders = masterList.filter((item) => {
     if (selectedPortal !== "all" && item.portal.toLowerCase() !== selectedPortal) {
       return false;
@@ -117,17 +118,24 @@ export default async function TendersDiscoveryPage({ searchParams }: DiscoveryPa
       const catLower = item.category.toLowerCase();
       const titleLower = item.title.toLowerCase();
 
-      if (selectedCategory === "it" && !catLower.includes("it") && !catLower.includes("software") && !catLower.includes("compute")) {
-        return false;
-      }
-      if (selectedCategory === "telecom" && !catLower.includes("telecom") && !titleLower.includes("fiber")) {
-        return false;
-      }
-      if (selectedCategory === "smart_city" && !catLower.includes("smart") && !catLower.includes("surveillance")) {
-        return false;
-      }
-      if (selectedCategory === "software" && !catLower.includes("software") && !catLower.includes("hims")) {
-        return false;
+      if (selectedCategory === "civil") {
+        if (!catLower.includes("civil") && !catLower.includes("works") && !titleLower.includes("road") && !titleLower.includes("bridge") && !titleLower.includes("building")) return false;
+      } else if (selectedCategory === "electrical_solar" || selectedCategory === "solar") {
+        if (!catLower.includes("solar") && !catLower.includes("electric") && !titleLower.includes("solar") && !titleLower.includes("substation") && !titleLower.includes("led")) return false;
+      } else if (selectedCategory === "it_software" || selectedCategory === "it") {
+        if (!catLower.includes("it") && !catLower.includes("software") && !catLower.includes("compute") && !titleLower.includes("cloud") && !titleLower.includes("hims") && !titleLower.includes("firewall") && !titleLower.includes("h100")) return false;
+      } else if (selectedCategory === "healthcare" || selectedCategory === "medical") {
+        if (!catLower.includes("health") && !catLower.includes("medical") && !titleLower.includes("aiims") && !titleLower.includes("radiology") && !titleLower.includes("pharmaceutical") && !titleLower.includes("pathology")) return false;
+      } else if (selectedCategory === "facility_security" || selectedCategory === "facility" || selectedCategory === "security") {
+        if (!catLower.includes("facility") && !catLower.includes("security") && !titleLower.includes("security") && !titleLower.includes("housekeeping") && !titleLower.includes("cleaning") && !titleLower.includes("sanitation")) return false;
+      } else if (selectedCategory === "fleet_logistics" || selectedCategory === "fleet" || selectedCategory === "transport") {
+        if (!catLower.includes("fleet") && !catLower.includes("transport") && !catLower.includes("logistics") && !titleLower.includes("bus") && !titleLower.includes("freight") && !titleLower.includes("truck")) return false;
+      } else if (selectedCategory === "telecom" || selectedCategory === "ofc") {
+        if (!catLower.includes("telecom") && !catLower.includes("networking") && !titleLower.includes("fiber") && !titleLower.includes("ofc") && !titleLower.includes("broadband") && !titleLower.includes("railtel")) return false;
+      } else if (selectedCategory === "general_supplies" || selectedCategory === "goods" || selectedCategory === "msme") {
+        if (!catLower.includes("goods") && !catLower.includes("supplies") && !titleLower.includes("furniture") && !titleLower.includes("uniform") && !titleLower.includes("pump") && !titleLower.includes("pipes")) return false;
+      } else {
+        if (!catLower.includes(selectedCategory) && !titleLower.includes(selectedCategory)) return false;
       }
     }
 
@@ -152,10 +160,10 @@ export default async function TendersDiscoveryPage({ searchParams }: DiscoveryPa
           </div>
           <div className="flex-1">
             <h3 className="text-sm font-bold text-emerald-950">
-              Contractor Profile Registered • Live Government Portals Crawled!
+              Contractor Profile Registered • Universal Government Portals Crawled!
             </h3>
             <p className="mt-1 text-xs text-emerald-800 leading-relaxed">
-              Welcome, <strong>{companyName}</strong>. TenderOps AI has initialized your profile and scanned GeM (Government e-Marketplace), CPPP, and State Portals for <strong>{targetTrade}</strong> tenders. Direct portal links are verified below.
+              Welcome, <strong>{companyName}</strong>. TenderOps AI has initialized your contractor profile and scanned GeM (Government e-Marketplace), CPPP, and State Portals for <strong>{targetTrade}</strong> tenders. Direct portal links are verified below.
             </p>
           </div>
         </div>
@@ -166,7 +174,7 @@ export default async function TendersDiscoveryPage({ searchParams }: DiscoveryPa
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
-              Tender Discovery Feed
+              Universal Tender Discovery Feed
             </h1>
             <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700 border border-slate-200">
               {filteredTenders.length} Active Listings
@@ -183,16 +191,24 @@ export default async function TendersDiscoveryPage({ searchParams }: DiscoveryPa
           <ScanPortalsButton />
 
           <Link
-            href="/settings"
+            href="/draft-bid"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 transition shadow-2xs"
+          >
+            <FileText className="h-3.5 w-3.5 text-emerald-600" />
+            <span>AI Bid Drafter</span>
+          </Link>
+
+          <Link
+            href="/whatsapp-demo"
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-2xs"
           >
-            <SlidersHorizontal className="h-3.5 w-3.5 text-slate-400" />
-            <span>Edit Profile</span>
+            <Smartphone className="h-3.5 w-3.5 text-emerald-600" />
+            <span>WhatsApp SDR</span>
           </Link>
         </div>
       </div>
 
-      {/* URL-Synced Interactive Search & Filtering Bar */}
+      {/* URL-Synced Interactive Search & Universal Trade Filtering Bar */}
       <TenderFilters />
 
       {/* Tender Cards Stream */}
@@ -210,7 +226,7 @@ export default async function TendersDiscoveryPage({ searchParams }: DiscoveryPa
           </div>
           <h3 className="mt-4 text-sm font-bold text-slate-900">No tenders match your filters</h3>
           <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
-            Try searching with broader terms, switching portals, or scanning live portals again.
+            Try switching trades above, searching with broader keywords, or clicking &quot;Scan Live Portals&quot;.
           </p>
           <div className="mt-5 flex items-center justify-center gap-3">
             <Link

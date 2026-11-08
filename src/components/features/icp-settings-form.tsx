@@ -37,14 +37,14 @@ export interface ICPSettingsData {
 }
 
 const COMMON_TRADES = [
-  "Information Technology & Software",
-  "Cloud Infrastructure & Data Centers",
-  "Cyber Security & Firewalls",
-  "Telecommunications & Networking",
-  "Smart City & IoT Surveillance",
-  "Healthcare & Telemedicine Systems",
   "Civil Infrastructure & Works",
   "Electrical & Solar Power",
+  "Information Technology & Software",
+  "Healthcare & Medical Equipment",
+  "Facility Management & Security",
+  "Fleet, Transport & Logistics",
+  "Telecommunications & Networking",
+  "General Goods & MSME Supplies",
 ];
 
 const COMMON_STATES = [
@@ -56,15 +56,22 @@ const COMMON_STATES = [
   "Tamil Nadu",
   "Gujarat",
   "Telangana",
+  "West Bengal",
 ];
 
 const COMMON_CERTS = [
-  "MSME / Udyam",
-  "DPIIT Startup",
-  "ISO 9001",
-  "ISO 27001",
-  "CMMI Level 3",
-  "CMMI Level 5",
+  "MSME / Udyam (GFR 173(i) Waiver)",
+  "Make in India Class-1 (>50% Local)",
+  "PWD / CPWD Class 1-A License",
+  "MNRE ALMM Solar Empanelment",
+  "Class-1 Electrical CEA License",
+  "CDSCO Form 20B/21B Wholesale License",
+  "PSARA Security License",
+  "AIS-140 GPS VLT Certified",
+  "DoT IP-1 Infrastructure",
+  "CMMI Level 3+",
+  "ISO 9001 / ISO 27001",
+  "DPIIT Startup India",
 ];
 
 export function ICPSettingsForm({ initialData }: { initialData: ICPSettingsData }) {

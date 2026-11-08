@@ -27,14 +27,14 @@ import {
 } from "lucide-react";
 
 const COMMON_TRADES = [
-  "Information Technology & Software",
-  "Cloud Infrastructure & Data Centers",
-  "Cyber Security & Networking",
-  "Smart City & Surveillance",
-  "Healthcare & Telemedicine Systems",
   "Civil Infrastructure & Works",
   "Electrical & Solar Power",
+  "Information Technology & Software",
+  "Healthcare & Medical Equipment",
+  "Facility Management & Security",
+  "Fleet, Transport & Logistics",
   "Telecommunications & Networking",
+  "General Goods & MSME Supplies",
 ];
 
 const COMMON_STATES = [
@@ -46,14 +46,22 @@ const COMMON_STATES = [
   "Tamil Nadu",
   "Gujarat",
   "Telangana",
+  "West Bengal",
 ];
 
 const COMMON_CERTS = [
-  "MSME / Udyam Registered",
+  "MSME / Udyam Registered (GFR 173(i) Waiver)",
+  "Make in India Class-1 (>50% Local Content)",
+  "PWD / CPWD Class 1-A License",
+  "MNRE ALMM Empanelled (Solar PV)",
+  "Class-1 Electrical Inspectorate License",
+  "CDSCO Form 20B/21B Wholesale License",
+  "PSARA Security Agency License",
+  "AIS-140 GPS VLT Certified Fleet",
+  "DoT IP-1 Infrastructure Registration",
+  "CMMI Level 3+ / ISO 27001",
   "ISO 9001:2015",
-  "ISO 27001",
-  "CMMI Level 3+",
-  "DPIIT Startup India",
+  "DPIIT Startup India Recognized",
 ];
 
 export function RegisterForm() {

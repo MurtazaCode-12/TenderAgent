@@ -19,6 +19,7 @@ import {
   Loader2,
   Clock,
   Globe,
+  FileText,
 } from "lucide-react";
 
 export interface TenderCardData {
@@ -356,6 +357,15 @@ export function TenderCard({ tender }: { tender: TenderCardData }) {
             <ExternalLink className="h-3.5 w-3.5" />
             <span>Go to {portalLabel} Listing</span>
           </a>
+
+          <Link
+            href={`/draft-bid?tenderId=${tender.id}&ref=${encodeURIComponent(tender.tender_ref_number)}&title=${encodeURIComponent(tender.title)}&category=${encodeURIComponent(tender.category)}`}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50/60 px-3 py-2 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 transition shadow-2xs"
+            title="Draft GFR 173(i) EMD Exemption, Make in India Declaration & Trade Schedules"
+          >
+            <FileText className="h-3.5 w-3.5 text-emerald-600" />
+            <span>Draft Bid</span>
+          </Link>
 
           <Link
             href={`/compliance?tenderId=${tender.id}&title=${encodeURIComponent(tender.title)}`}

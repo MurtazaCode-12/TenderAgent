@@ -1,9 +1,209 @@
 {
-  "users": [],
-  "companies": [],
-  "profiles": [],
-  "company_icps": [],
+  "users": [
+    {
+      "id": "556fb98d-159d-46a4-be3a-bcfc3e9e70ee",
+      "username": "murtaza",
+      "email": "murtaza@mcodes.tech",
+      "password_hash": "347570e72fa6e1cdd43e5b757f711989d4a238d7831c0b33d0c00facef95805a",
+      "full_name": "Murtaza",
+      "company_name": "Mcodes",
+      "phone_number": "+919970666052",
+      "created_at": "2026-11-08T12:05:12.043Z"
+    }
+  ],
+  "companies": [
+    {
+      "id": "4f1966f8-c9eb-4826-b664-45e82d4e5f77",
+      "name": "Mcodes",
+      "legal_name": "Mcodes",
+      "created_at": "2026-11-08T12:05:12.043Z"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "556fb98d-159d-46a4-be3a-bcfc3e9e70ee",
+      "company_id": "4f1966f8-c9eb-4826-b664-45e82d4e5f77",
+      "full_name": "Murtaza",
+      "email": "murtaza@mcodes.tech",
+      "phone_number": "+919970666052",
+      "role": "owner",
+      "whatsapp_enabled": true,
+      "created_at": "2026-11-08T12:05:12.043Z"
+    }
+  ],
+  "company_icps": [
+    {
+      "id": "373986ba-a0f7-4724-87d9-92b13679eb80",
+      "company_id": "4f1966f8-c9eb-4826-b664-45e82d4e5f77",
+      "title": "Mcodes Bidding ICP",
+      "target_categories": [
+        "Information Technology & Software",
+        "Smart City & Surveillance",
+        "Telecommunications & Networking"
+      ],
+      "min_tender_value": 100000,
+      "max_tender_value": 100000000,
+      "preferred_states": [
+        "Maharashtra"
+      ],
+      "excluded_keywords": [],
+      "required_certifications": [
+        "MSME / Udyam Registered"
+      ],
+      "min_annual_turnover": 40000,
+      "max_emd_capacity": 3000,
+      "icp_summary": "Enterprise IT system integrator providing cloud computing, networking firewalls, and digital software solutions to Central & State Government departments.",
+      "is_active": true,
+      "updated_at": "2026-11-08T12:05:12.043Z"
+    }
+  ],
   "tenders": [
+    {
+      "id": "b8abdab2-6e49-4e0c-997f-62ef6bc7034a",
+      "portal": "gem",
+      "tender_ref_number": "GEM/2026/B/8486816",
+      "title": "Comprehensive Annual Turnkey Service Contract for Information Technology & Software",
+      "authority_name": "Central Public Sector Enterprise / Ministry of Information",
+      "category": "Information Technology & Software",
+      "location_state": "Maharashtra",
+      "estimated_value": 35000000,
+      "emd_amount": 2000,
+      "published_date": "2026-11-07T12:05:13.284Z",
+      "submission_deadline": "2026-11-22T12:05:13.284Z",
+      "opening_date": "2026-11-23T12:05:13.284Z",
+      "direct_portal_url": "https://bidplus.gem.gov.in/all-bids",
+      "original_document_urls": [
+        "https://bidplus.gem.gov.in/all-bids"
+      ],
+      "raw_payload": {
+        "portal_url": "https://bidplus.gem.gov.in/all-bids",
+        "exemption": "MSME Udyam and Startup India bidders granted 100% EMD fee waiver"
+      },
+      "match_score": 97,
+      "ai_summary": {
+        "executive_summary": "Freshly published GeM Bid tailored to your Information Technology & Software bidding profile. Zero EMD required for MSME registered contractors.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "Directly matches industry keywords, budget limits, and geographic scope."
+      },
+      "created_at": "2026-11-08T12:05:13.284Z"
+    },
+    {
+      "id": "b5a27ab2-20b9-41fe-8d87-864061ff5e7f",
+      "portal": "state_portal",
+      "tender_ref_number": "STATE/KA/2026/BBMP/9012",
+      "title": "Development of AI-Powered Intelligent Solid Waste Management & Fleet GPS Tracking System",
+      "authority_name": "Bruhat Bengaluru Mahanagara Palike (BBMP), NR Square, Bengaluru",
+      "category": "IoT, CleanTech & Municipal Fleet Software",
+      "location_state": "Karnataka",
+      "estimated_value": 24000000,
+      "emd_amount": 480000,
+      "published_date": "2026-11-08T12:05:12.271Z",
+      "submission_deadline": "2026-11-19T12:05:12.271Z",
+      "opening_date": null,
+      "direct_portal_url": "https://kppp.karnataka.gov.in/docs/BBMP_IoT_Fleet_2026.pdf",
+      "original_document_urls": [
+        "https://kppp.karnataka.gov.in/docs/BBMP_IoT_Fleet_2026.pdf"
+      ],
+      "raw_payload": {
+        "msme_preference": "Local Karnataka MSME registered entities eligible for 15% price purchase preference"
+      },
+      "match_score": 80,
+      "ai_summary": {
+        "executive_summary": "Official procurement opportunity on STATE_PORTAL matching your Information Technology & Software, Smart City & Surveillance, Telecommunications & Networking trade. Direct portal bid documents verified.",
+        "bid_go_no_go_recommendation": "MODERATE_RISK",
+        "recommendation_rationale": "Matches your active trade and operational geography. Review tender RFP specifications directly on STATE_PORTAL."
+      },
+      "created_at": "2026-11-08T12:05:13.282Z"
+    },
+    {
+      "id": "f44c9825-4e1e-4bcc-99f9-00ec09ac0bcb",
+      "portal": "cppp",
+      "tender_ref_number": "CPPP/2026/RailTel/718301",
+      "title": "Optical Fiber Cable (OFC) Laying, Splicing & Telecom Infrastructure Maintenance for Western Railway Network",
+      "authority_name": "RailTel Corporation of India Ltd, Plate-A, 6th Floor, Office Block, East Kidwai Nagar, New Delhi",
+      "category": "Telecom Infrastructure & Network Engineering",
+      "location_state": "Maharashtra",
+      "estimated_value": 34000000,
+      "emd_amount": 680000,
+      "published_date": "2026-11-08T12:05:13.279Z",
+      "submission_deadline": "2026-11-23T12:05:13.279Z",
+      "opening_date": null,
+      "direct_portal_url": "https://eprocure.gov.in/epublish/doc/RailTel_OFC_Western_RFP.pdf",
+      "original_document_urls": [
+        "https://eprocure.gov.in/epublish/doc/RailTel_OFC_Western_RFP.pdf"
+      ],
+      "raw_payload": {
+        "telecom_license": "Valid DoT IP-1 Registration Certificate mandatory",
+        "joint_venture": "Joint Venture / Consortium bidding permitted up to maximum 2 partners"
+      },
+      "match_score": 80,
+      "ai_summary": {
+        "executive_summary": "Official procurement opportunity on CPPP matching your Information Technology & Software, Smart City & Surveillance, Telecommunications & Networking trade. Direct portal bid documents verified.",
+        "bid_go_no_go_recommendation": "MODERATE_RISK",
+        "recommendation_rationale": "Matches your active trade and operational geography. Review tender RFP specifications directly on CPPP."
+      },
+      "created_at": "2026-11-08T12:05:13.282Z"
+    },
+    {
+      "id": "034a7654-1b92-4b98-83c8-783424eb6368",
+      "portal": "cppp",
+      "tender_ref_number": "CPPP/2026/MoHFW/641029",
+      "title": "Selection of System Integrator for Design, Development, and Pan-India Operations of ABDM-Compliant Hospital Information Management System (HIMS)",
+      "authority_name": "Ministry of Health and Family Welfare (MoHFW), Nirman Bhawan, New Delhi",
+      "category": "Software Development & Digital Health Infrastructure",
+      "location_state": "PAN_INDIA",
+      "estimated_value": 95000000,
+      "emd_amount": 1900000,
+      "published_date": "2026-11-08T12:05:13.279Z",
+      "submission_deadline": "2026-11-26T12:05:13.279Z",
+      "opening_date": null,
+      "direct_portal_url": "https://eprocure.gov.in/epublish/doc/HIMS_MoHFW_RFP_2026.pdf",
+      "original_document_urls": [
+        "https://eprocure.gov.in/epublish/doc/HIMS_MoHFW_RFP_2026.pdf"
+      ],
+      "raw_payload": {
+        "quality_certification": "Mandatory CMMI Level 3 or Level 5 DEV appraisal required",
+        "financial_clause": "Average audited annual software turnover of at least ₹15 Crores over FY 2023-24, 2024-25, 2025-26",
+        "security_audit": "CERT-In empaneled security audit certification prior to production go-live"
+      },
+      "match_score": 80,
+      "ai_summary": {
+        "executive_summary": "Official procurement opportunity on CPPP matching your Information Technology & Software, Smart City & Surveillance, Telecommunications & Networking trade. Direct portal bid documents verified.",
+        "bid_go_no_go_recommendation": "MODERATE_RISK",
+        "recommendation_rationale": "Matches your active trade and operational geography. Review tender RFP specifications directly on CPPP."
+      },
+      "created_at": "2026-11-08T12:05:13.281Z"
+    },
+    {
+      "id": "291b446f-5cce-4e87-a1d9-0cf98e7d8b99",
+      "portal": "gem",
+      "tender_ref_number": "GEM/2026/B/9182301",
+      "title": "Supply, Testing & Commissioning of High-Performance GPU AI Compute Cluster & Storage Subsystem",
+      "authority_name": "Department of Science and Technology, Technology Bhawan, New Delhi",
+      "category": "Information Technology & AI Compute",
+      "location_state": "Delhi",
+      "estimated_value": 48500000,
+      "emd_amount": 970000,
+      "published_date": "2026-11-08T12:05:12.575Z",
+      "submission_deadline": "2026-11-17T12:05:12.575Z",
+      "opening_date": null,
+      "direct_portal_url": "https://bidplus.gem.gov.in/bids/view/GEM-2026-B-9182301.pdf",
+      "original_document_urls": [
+        "https://bidplus.gem.gov.in/bids/view/GEM-2026-B-9182301.pdf"
+      ],
+      "raw_payload": {
+        "oem_compliance": "Mandatory OEM Authorization Form (MAF) required with tender reference",
+        "msme_relaxation": "Exemption from EMD and prior turnover allowed under Rule 173(i) of GFR 2017",
+        "make_in_india": "Class-I Local Supplier preference applicable (minimum 50% local content)"
+      },
+      "match_score": 80,
+      "ai_summary": {
+        "executive_summary": "Official procurement opportunity on GEM matching your Information Technology & Software, Smart City & Surveillance, Telecommunications & Networking trade. Direct portal bid documents verified.",
+        "bid_go_no_go_recommendation": "MODERATE_RISK",
+        "recommendation_rationale": "Matches your active trade and operational geography. Review tender RFP specifications directly on GEM."
+      },
+      "created_at": "2026-11-08T12:05:13.281Z"
+    },
     {
       "id": "00000000-0000-0000-0000-000000000011",
       "portal": "cppp",
@@ -36,65 +236,67 @@
       "created_at": "2026-11-08T11:29:53.157Z"
     },
     {
-      "id": "00000000-0000-0000-0000-000000000012",
+      "id": "0365da8a-6fd2-45c6-9769-a7e17cb94a05",
       "portal": "gem",
       "tender_ref_number": "GEM/2026/B/8834920",
       "title": "Annual Comprehensive Maintenance Contract for Cisco Core Routing, Switching and UTM Firewall Architecture",
       "authority_name": "National Informatics Centre Services Inc. (NICSI), Ministry of Electronics and IT",
-      "category": "Cyber Security & Networking",
+      "category": "Networking & Cyber Security Services",
       "location_state": "PAN_INDIA",
       "estimated_value": 12500000,
       "emd_amount": 250000,
-      "published_date": "2026-11-06T11:29:53.157Z",
-      "submission_deadline": "2026-11-20T11:29:53.157Z",
-      "opening_date": "2026-11-21T11:29:53.157Z",
-      "direct_portal_url": "https://bidplus.gem.gov.in/showbidDocument/8834920",
+      "published_date": "2026-11-08T12:05:12.575Z",
+      "submission_deadline": "2026-11-20T12:05:12.575Z",
+      "opening_date": null,
+      "direct_portal_url": "https://bidplus.gem.gov.in/bids/view/GEM-2026-B-8834920.pdf",
       "original_document_urls": [
-        "https://bidplus.gem.gov.in/showbidDocument/8834920"
+        "https://bidplus.gem.gov.in/bids/view/GEM-2026-B-8834920.pdf"
       ],
       "raw_payload": {
-        "portal_url": "https://bidplus.gem.gov.in/showbidDocument/8834920",
         "sla_uptime": "99.5% uptime required with 4-hour MTTR SLA",
-        "certifications": "ISO 9001:2015 and ISO 27001:2022 mandatory",
+        "certifications_required": [
+          "ISO 9001:2015",
+          "ISO 27001:2022"
+        ],
         "past_experience": "Must have executed at least 3 similar AMC contracts with government PSUs in last 5 years"
       },
-      "match_score": 87,
+      "match_score": 80,
       "ai_summary": {
-        "executive_summary": "Annual maintenance contract covering 140+ core switches, routers, and firewalls across nationwide nodal centers. Zero EMD required for MSME entities.",
-        "bid_go_no_go_recommendation": "STRONG_BID",
-        "recommendation_rationale": "Low barrier to entry for certified Cisco gold/premier network integrators."
+        "executive_summary": "Official procurement opportunity on GEM matching your Information Technology & Software, Smart City & Surveillance, Telecommunications & Networking trade. Direct portal bid documents verified.",
+        "bid_go_no_go_recommendation": "MODERATE_RISK",
+        "recommendation_rationale": "Matches your active trade and operational geography. Review tender RFP specifications directly on GEM."
       },
-      "created_at": "2026-11-08T11:29:53.157Z"
+      "created_at": "2026-11-08T12:05:13.281Z"
     },
     {
-      "id": "00000000-0000-0000-0000-000000000013",
+      "id": "9a9ed0aa-08b6-4f6d-a9f4-ca1959865fe8",
       "portal": "state_portal",
       "tender_ref_number": "STATE/MH/2026/CIDCO/4192",
       "title": "Engineering, Procurement & Construction (EPC) of Smart Integrated Command & Control Center (ICCC)",
-      "authority_name": "City and Industrial Development Corporation of Maharashtra (CIDCO), Navi Mumbai",
-      "category": "Smart City & Surveillance",
+      "authority_name": "City and Industrial Development Corporation of Maharashtra (CIDCO), CBD Belapur, Navi Mumbai",
+      "category": "Smart City Infrastructure & AI Surveillance",
       "location_state": "Maharashtra",
       "estimated_value": 78000000,
       "emd_amount": 1560000,
-      "published_date": "2026-11-04T11:29:53.157Z",
-      "submission_deadline": "2026-11-24T11:29:53.157Z",
-      "opening_date": "2026-11-25T11:29:53.157Z",
-      "direct_portal_url": "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=CIDCO_4192",
+      "published_date": "2026-11-08T12:05:12.271Z",
+      "submission_deadline": "2026-11-24T12:05:12.271Z",
+      "opening_date": null,
+      "direct_portal_url": "https://mahatenders.gov.in/nicgep/app/CIDCO_ICCC_2026.pdf",
       "original_document_urls": [
-        "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=CIDCO_4192"
+        "https://mahatenders.gov.in/nicgep/app/CIDCO_ICCC_2026.pdf"
       ],
       "raw_payload": {
-        "portal_url": "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=CIDCO_4192",
         "contractor_class": "Registered with Maharashtra PWD in Class-I (Civil & Electrical)",
-        "local_office": "Must maintain an operational regional service center in Mumbai Metropolitan Region"
+        "iso_cert": "ISO 9001 and ISO 27001 compliance mandatory",
+        "local_office": "Must maintain or establish an operational regional service office in MMR within 30 days of award"
       },
-      "match_score": 82,
+      "match_score": 80,
       "ai_summary": {
-        "executive_summary": "City-wide fiber backbone and 800+ AI CCTV cameras with automated number plate recognition. Attention: Requires Class-I PWD registration and regional MMR presence.",
+        "executive_summary": "Official procurement opportunity on STATE_PORTAL matching your Information Technology & Software, Smart City & Surveillance, Telecommunications & Networking trade. Direct portal bid documents verified.",
         "bid_go_no_go_recommendation": "MODERATE_RISK",
-        "recommendation_rationale": "High contract value, but requires physical civil construction partnership to fulfill PWD Class-I clause."
+        "recommendation_rationale": "Matches your active trade and operational geography. Review tender RFP specifications directly on STATE_PORTAL."
       },
-      "created_at": "2026-11-08T11:29:53.157Z"
+      "created_at": "2026-11-08T12:05:13.282Z"
     },
     {
       "id": "00000000-0000-0000-0000-000000000014",
@@ -183,8 +385,612 @@
         "recommendation_rationale": "Direct match with smart city surveillance capabilities and cloud analytics."
       },
       "created_at": "2026-11-08T11:29:53.157Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "portal": "state_portal",
+      "tender_ref_number": "PWD/MH/2026/ROAD/9182",
+      "title": "Widening, Strengthening & Bituminous Overlay of State Highway 42 with Concrete Bridges & Drainage",
+      "authority_name": "Public Works Department (PWD), Government of Maharashtra",
+      "category": "Civil Infrastructure & Works",
+      "location_state": "Maharashtra",
+      "estimated_value": 125000000,
+      "emd_amount": 2500000,
+      "published_date": "2026-11-06T12:38:06.517Z",
+      "submission_deadline": "2026-11-28T12:38:06.517Z",
+      "opening_date": "2026-11-29T12:38:06.517Z",
+      "direct_portal_url": "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=PWD_MH_ROAD_9182",
+      "original_document_urls": [
+        "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=PWD_MH_ROAD_9182"
+      ],
+      "raw_payload": {
+        "portal_url": "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=PWD_MH_ROAD_9182",
+        "class_registration": "Class 1(A) PWD Registration mandatory",
+        "hot_mix_plant": "Contractor must own or lease asphalt batch mix plant within 50km",
+        "solvency_certificate": "Bank Solvency Certificate of minimum ₹3.00 Crores required"
+      },
+      "match_score": 95,
+      "ai_summary": {
+        "executive_summary": "Major state highway widening and bituminous overlay across 42 km with RCC box culverts. Requires asphalt hot mix plant ownership/lease and Class 1(A) civil contractor empanelment.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "Matches targeted civil construction category. MSME contractors eligible for EMD exemption consideration."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000002",
+      "portal": "cppp",
+      "tender_ref_number": "CPWD/2026/CIVIL/BLDG/1042",
+      "title": "Construction of Multi-Storey Composite Administrative Block & Rainwater Harvesting Structures",
+      "authority_name": "Central Public Works Department (CPWD), Northern Zone",
+      "category": "Civil Infrastructure & Works",
+      "location_state": "Delhi",
+      "estimated_value": 240000000,
+      "emd_amount": 4800000,
+      "published_date": "2026-11-04T12:38:06.517Z",
+      "submission_deadline": "2026-12-02T12:38:06.517Z",
+      "opening_date": "2026-12-03T12:38:06.517Z",
+      "direct_portal_url": "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=CPWD_CIVIL_BLDG_1042",
+      "original_document_urls": [
+        "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=CPWD_CIVIL_BLDG_1042"
+      ],
+      "raw_payload": {
+        "portal_url": "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=CPWD_CIVIL_BLDG_1042",
+        "cpwd_enlistment": "Class-I (Super Composite) CPWD enlistment required",
+        "green_building": "GRIHA 3-Star or IGBC Gold compliance required"
+      },
+      "match_score": 91,
+      "ai_summary": {
+        "executive_summary": "Turnkey institutional building construction including basement, civil RCC frame, HVAC, and green stormwater recharging units. 24-month completion schedule.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "High contract value CPWD flagship project with milestone-based payment escrow."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000003",
+      "portal": "gem",
+      "tender_ref_number": "GEM/2026/B/8912440",
+      "title": "Annual Rate Contract for Comprehensive Road Patchwork, Bituminous Macadam & Stormwater Drainage",
+      "authority_name": "National Highways Authority of India (NHAI), Regional Office",
+      "category": "Civil Infrastructure & Works",
+      "location_state": "Uttar Pradesh",
+      "estimated_value": 68000000,
+      "emd_amount": 1360000,
+      "published_date": "2026-11-07T12:38:06.517Z",
+      "submission_deadline": "2026-11-22T12:38:06.517Z",
+      "opening_date": "2026-11-23T12:38:06.517Z",
+      "direct_portal_url": "https://bidplus.gem.gov.in/showbidDocument/8912440",
+      "original_document_urls": [
+        "https://bidplus.gem.gov.in/showbidDocument/8912440"
+      ],
+      "raw_payload": {
+        "portal_url": "https://bidplus.gem.gov.in/showbidDocument/8912440",
+        "equipment_list": "Paver finisher, tandem roller, and bitumen distributor truck mandatory",
+        "msme_exemption": "Rule 173(i) GFR 2017 100% EMD fee waiver valid for Udyam entities"
+      },
+      "match_score": 88,
+      "ai_summary": {
+        "executive_summary": "NHAI maintenance rate contract covering 85 km national highway stretch. Includes pothole patching, bituminous concrete micro-surfacing, and drain desilting.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "Zero EMD for Udyam MSME bidders. Standard equipment qualification checks."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000004",
+      "portal": "gem",
+      "tender_ref_number": "GEM/2026/B/8982310",
+      "title": "Design, Supply, Erection & 25-Year Operation of 5MW Grid-Connected Rooftop Solar PV Plants with ALMM Tier-1 Modules",
+      "authority_name": "Solar Energy Corporation of India Ltd (SECI) / NTPC",
+      "category": "Electrical & Solar Power",
+      "location_state": "PAN_INDIA",
+      "estimated_value": 195000000,
+      "emd_amount": 3900000,
+      "published_date": "2026-11-05T12:38:06.517Z",
+      "submission_deadline": "2026-12-03T12:38:06.517Z",
+      "opening_date": "2026-12-04T12:38:06.517Z",
+      "direct_portal_url": "https://bidplus.gem.gov.in/showbidDocument/8982310",
+      "original_document_urls": [
+        "https://bidplus.gem.gov.in/showbidDocument/8982310"
+      ],
+      "raw_payload": {
+        "portal_url": "https://bidplus.gem.gov.in/showbidDocument/8982310",
+        "almm_compliance": "Solar PV modules must be strictly sourced from MNRE ALMM List-I",
+        "electrical_license": "Class-1 Electrical Contractor License issued by State Electrical Inspectorate"
+      },
+      "match_score": 94,
+      "ai_summary": {
+        "executive_summary": "Grid-connected 5MW solar installation across 35 administrative office roofs. Includes net metering, inverter telemetry, and 25-year comprehensive AMC.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "Long term recurring maintenance revenue. MSME bidders exempted from EMD deposit."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000005",
+      "portal": "cppp",
+      "tender_ref_number": "CPPP/2026/POWER/SUBSTN/55120",
+      "title": "Turnkey EPC of 132/33 kV Gas Insulated Substation (GIS) and Associated Transmission Lines",
+      "authority_name": "Power Grid Corporation of India Limited (POWERGRID)",
+      "category": "Electrical & Solar Power",
+      "location_state": "Gujarat",
+      "estimated_value": 420000000,
+      "emd_amount": 8400000,
+      "published_date": "2026-11-03T12:38:06.517Z",
+      "submission_deadline": "2026-12-06T12:38:06.517Z",
+      "opening_date": "2026-12-07T12:38:06.517Z",
+      "direct_portal_url": "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=POWER_SUBSTN_55120",
+      "original_document_urls": [
+        "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=POWER_SUBSTN_55120"
+      ],
+      "raw_payload": {
+        "portal_url": "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=POWER_SUBSTN_55120",
+        "gis_experience": "Must have successfully commissioned at least one 132kV GIS bay in last 7 years",
+        "safety_standard": "CEA Safety Regulations 2023 adherence mandatory"
+      },
+      "match_score": 87,
+      "ai_summary": {
+        "executive_summary": "Turnkey construction of 132/33 kV Gas Insulated Substation with SCADA automation and 18 km overhead tower transmission lines.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "High contract value EPC for licensed electrical contractors with GIS or substation execution credentials."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000006",
+      "portal": "state_portal",
+      "tender_ref_number": "STATE/KA/2026/BESCOM/7821",
+      "title": "Installation of Energy-Efficient LED Smart Street Lighting System with Automated Centralized Control Monitoring",
+      "authority_name": "Bangalore Electricity Supply Company (BESCOM) / KPPP Karnataka",
+      "category": "Electrical & Solar Power",
+      "location_state": "Karnataka",
+      "estimated_value": 84000000,
+      "emd_amount": 1680000,
+      "published_date": "2026-11-06T12:38:06.517Z",
+      "submission_deadline": "2026-11-24T12:38:06.517Z",
+      "opening_date": "2026-11-25T12:38:06.517Z",
+      "direct_portal_url": "https://kppp.karnataka.gov.in/portal/tenderDetails?id=BESCOM_LED_7821",
+      "original_document_urls": [
+        "https://kppp.karnataka.gov.in/portal/tenderDetails?id=BESCOM_LED_7821"
+      ],
+      "raw_payload": {
+        "portal_url": "https://kppp.karnataka.gov.in/portal/tenderDetails?id=BESCOM_LED_7821",
+        "ccms_telemetry": "Central Control & Monitoring System with GSM/GPRS feeder panels",
+        "warranty": "7-year comprehensive on-site replacement warranty"
+      },
+      "match_score": 93,
+      "ai_summary": {
+        "executive_summary": "Replacement of 32,000 sodium vapor lamps with energy-efficient smart LED fixtures and cloud telemetry feeder pillars. 7-year performance contract.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "High win probability for electrical integrators. MSME exemption applies."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000007",
+      "portal": "cppp",
+      "tender_ref_number": "CPPP/2026/AIIMS/MEDEQ/39201",
+      "title": "Supply, Installation & 5-Year Maintenance of High-Resolution Digital Radiology, MRI Telemetry & ICU Monitoring Units",
+      "authority_name": "All India Institute of Medical Sciences (AIIMS), Ansari Nagar, New Delhi",
+      "category": "Healthcare & Medical Equipment",
+      "location_state": "Delhi",
+      "estimated_value": 84000000,
+      "emd_amount": 1680000,
+      "published_date": "2026-11-07T12:38:06.517Z",
+      "submission_deadline": "2026-11-23T12:38:06.517Z",
+      "opening_date": "2026-11-24T12:38:06.517Z",
+      "direct_portal_url": "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=AIIMS_MEDEQ_39201",
+      "original_document_urls": [
+        "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=AIIMS_MEDEQ_39201"
+      ],
+      "raw_payload": {
+        "portal_url": "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=AIIMS_MEDEQ_39201",
+        "regulatory_clearance": "US FDA or European CE (IVDR) along with CDSCO Form 20B/21B mandatory",
+        "oem_direct": "Manufacturer Authorization Form required for Indian authorized distributors"
+      },
+      "match_score": 95,
+      "ai_summary": {
+        "executive_summary": "High-precision digital imaging and telemetry monitors for ICU surgical wings. Includes 5-year comprehensive warranty and biomedical calibration.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "Established medical equipment supplier profile matches regulatory criteria."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000008",
+      "portal": "gem",
+      "tender_ref_number": "GEM/2026/B/8955102",
+      "title": "Rate Contract for Supply of Essential Critical-Care Oncology Injectables and CDSCO-Approved Generic Pharmaceuticals",
+      "authority_name": "Employees' State Insurance Corporation (ESIC), Ministry of Labour",
+      "category": "Healthcare & Medical Equipment",
+      "location_state": "PAN_INDIA",
+      "estimated_value": 36000000,
+      "emd_amount": 720000,
+      "published_date": "2026-11-05T12:38:06.517Z",
+      "submission_deadline": "2026-11-19T12:38:06.517Z",
+      "opening_date": "2026-11-20T12:38:06.517Z",
+      "direct_portal_url": "https://bidplus.gem.gov.in/showbidDocument/8955102",
+      "original_document_urls": [
+        "https://bidplus.gem.gov.in/showbidDocument/8955102"
+      ],
+      "raw_payload": {
+        "portal_url": "https://bidplus.gem.gov.in/showbidDocument/8955102",
+        "who_gmp": "WHO-GMP certificate and valid Drug Manufacturing/Wholesale License required",
+        "cold_chain": "Temperature logging cold-chain data loggers during transit required"
+      },
+      "match_score": 89,
+      "ai_summary": {
+        "executive_summary": "Two-year pharmaceutical supply rate contract across 48 ESIC hospitals. Guaranteed temperature-controlled batch deliveries with CoA batch release.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "Favorable rate contract for licensed pharmaceutical distributors. MSME EMD waiver applicable."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000009",
+      "portal": "state_portal",
+      "tender_ref_number": "STATE/TN/2026/TNMSC/2910",
+      "title": "Turnkey Diagnostic Pathology Laboratory Automation and Biochemistry Reagent Closed Systems",
+      "authority_name": "Tamil Nadu Medical Services Corporation (TNMSC), Chennai",
+      "category": "Healthcare & Medical Equipment",
+      "location_state": "Tamil Nadu",
+      "estimated_value": 112000000,
+      "emd_amount": 2240000,
+      "published_date": "2026-11-04T12:38:06.517Z",
+      "submission_deadline": "2026-11-30T12:38:06.517Z",
+      "opening_date": "2026-12-01T12:38:06.517Z",
+      "direct_portal_url": "https://tenders.tn.gov.in/innerpage.asp?choice=tnmsc_2910",
+      "original_document_urls": [
+        "https://tenders.tn.gov.in/innerpage.asp?choice=tnmsc_2910"
+      ],
+      "raw_payload": {
+        "portal_url": "https://tenders.tn.gov.in/innerpage.asp?choice=tnmsc_2910",
+        "reagent_lockin": "Reagent rental model with automated high-throughput chemiluminescence analyzers"
+      },
+      "match_score": 91,
+      "ai_summary": {
+        "executive_summary": "Automated clinical biochemistry analyzers across 38 district headquarters hospitals. Cost-per-test reagent procurement model.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "High volume diagnostic recurring contract with robust state budget backing."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000017",
+      "portal": "gem",
+      "tender_ref_number": "GEM/2026/B/8966320",
+      "title": "Annual Contract for 24x7 Armed & Unarmed Security Guard Services and Centralized Control Room Operations across 14 PSU Campuses",
+      "authority_name": "Indian Oil Corporation Limited (IOCL) / ONGC Regional Refineries",
+      "category": "Facility Management & Security",
+      "location_state": "PAN_INDIA",
+      "estimated_value": 54000000,
+      "emd_amount": 1080000,
+      "published_date": "2026-11-06T12:38:06.517Z",
+      "submission_deadline": "2026-11-21T12:38:06.517Z",
+      "opening_date": "2026-11-22T12:38:06.517Z",
+      "direct_portal_url": "https://bidplus.gem.gov.in/showbidDocument/8966320",
+      "original_document_urls": [
+        "https://bidplus.gem.gov.in/showbidDocument/8966320"
+      ],
+      "raw_payload": {
+        "portal_url": "https://bidplus.gem.gov.in/showbidDocument/8966320",
+        "psara_license": "Valid Private Security Agencies Regulation Act (PSARA) License in respective states",
+        "minimum_wages": "Strict adherence to Central Chief Labour Commissioner minimum wage revisions",
+        "epfo_esic": "Continuous EPFO/ESIC remittance track record for past 3 years"
+      },
+      "match_score": 94,
+      "ai_summary": {
+        "executive_summary": "Deployment of 280+ certified armed and unarmed security personnel with biometric muster roll and drone perimeter surveillance across refinery installations.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "High contract volume with wage escalation protection clauses. Zero EMD for MSME security agencies."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000018",
+      "portal": "cppp",
+      "tender_ref_number": "CPPP/2026/AAI/FM/88219",
+      "title": "Mechanized Housekeeping, Bio-Waste Sanitation, Pest Management & Façade Cleaning Services at International Airport Terminal",
+      "authority_name": "Airports Authority of India (AAI), Rajiv Gandhi Bhawan, New Delhi",
+      "category": "Facility Management & Security",
+      "location_state": "Maharashtra",
+      "estimated_value": 71000000,
+      "emd_amount": 1420000,
+      "published_date": "2026-11-05T12:38:06.517Z",
+      "submission_deadline": "2026-11-27T12:38:06.517Z",
+      "opening_date": "2026-11-28T12:38:06.517Z",
+      "direct_portal_url": "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=AAI_FM_88219",
+      "original_document_urls": [
+        "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=AAI_FM_88219"
+      ],
+      "raw_payload": {
+        "portal_url": "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=AAI_FM_88219",
+        "machinery_ownership": "Ride-on floor scrubbers, high-reach scissor lifts, and ozone steam cleaners",
+        "iso_certifications": "ISO 14001 (Environmental) and ISO 45001 (OH&S) mandatory"
+      },
+      "match_score": 92,
+      "ai_summary": {
+        "executive_summary": "Airport terminal 24x7 mechanized housekeeping, glass facade cradles, passenger trolley sanitization, and green bio-waste disposal. 3-year contract.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "Excellent opportunity for organized facility management firms with mechanized cleaning fleets."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000019",
+      "portal": "state_portal",
+      "tender_ref_number": "STATE/DL/2026/DMRC/1092",
+      "title": "Integrated Multi-Station Station Facility Management, Passenger Assistance & Sanitation Manpower",
+      "authority_name": "Delhi Metro Rail Corporation (DMRC) Metro Bhawan",
+      "category": "Facility Management & Security",
+      "location_state": "Delhi",
+      "estimated_value": 45000000,
+      "emd_amount": 900000,
+      "published_date": "2026-11-07T12:38:06.517Z",
+      "submission_deadline": "2026-11-18T12:38:06.517Z",
+      "opening_date": "2026-11-19T12:38:06.517Z",
+      "direct_portal_url": "https://delhimetrorail.info/tenders/dmrc_fm_1092",
+      "original_document_urls": [
+        "https://delhimetrorail.info/tenders/dmrc_fm_1092"
+      ],
+      "raw_payload": {
+        "portal_url": "https://delhimetrorail.info/tenders/dmrc_fm_1092",
+        "rapid_transit_exp": "Must have experience managing public transport terminal facilities"
+      },
+      "match_score": 90,
+      "ai_summary": {
+        "executive_summary": "Station cleaning and crowd management staff across 12 interchange metro stations with passenger queue management and round-the-clock shift staffing.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "Reliable monthly payment cycle backed by Delhi Metro transit authority."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000020",
+      "portal": "gem",
+      "tender_ref_number": "GEM/2026/B/8977410",
+      "title": "Wet-Lease Contracting for 250 Electric Air-Conditioned City Transit Buses with Dedicated EV Depot Charging Infrastructure",
+      "authority_name": "State Road Transport Undertaking (SRTU) / FAME-II Green Mobility",
+      "category": "Fleet, Transport & Logistics",
+      "location_state": "PAN_INDIA",
+      "estimated_value": 380000000,
+      "emd_amount": 7600000,
+      "published_date": "2026-11-04T12:38:06.517Z",
+      "submission_deadline": "2026-12-08T12:38:06.517Z",
+      "opening_date": "2026-12-09T12:38:06.517Z",
+      "direct_portal_url": "https://bidplus.gem.gov.in/showbidDocument/8977410",
+      "original_document_urls": [
+        "https://bidplus.gem.gov.in/showbidDocument/8977410"
+      ],
+      "raw_payload": {
+        "portal_url": "https://bidplus.gem.gov.in/showbidDocument/8977410",
+        "ais_140": "AIS-140 certified GPS telematics and emergency panic button units mandatory",
+        "gcc_model": "Gross Cost Contract (GCC) per-kilometer rate model with guaranteed minimum daily run"
+      },
+      "match_score": 93,
+      "ai_summary": {
+        "executive_summary": "10-year GCC wet-lease deployment of 250 zero-emission electric low-floor passenger buses including driver staffing and fast-charging bay setup.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "Predictable per-kilometer revenue model under National Clean Air Programme funding."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000021",
+      "portal": "cppp",
+      "tender_ref_number": "CPPP/2026/FCI/LOGIST/31209",
+      "title": "Nationwide Inter-State Multimodal Container Freight Haulage and Cold-Chain Reefer Logistics Services",
+      "authority_name": "Food Corporation of India (FCI) / Central Warehousing Corporation",
+      "category": "Fleet, Transport & Logistics",
+      "location_state": "PAN_INDIA",
+      "estimated_value": 165000000,
+      "emd_amount": 3300000,
+      "published_date": "2026-11-06T12:38:06.517Z",
+      "submission_deadline": "2026-11-25T12:38:06.517Z",
+      "opening_date": "2026-11-26T12:38:06.517Z",
+      "direct_portal_url": "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=FCI_LOGIST_31209",
+      "original_document_urls": [
+        "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=FCI_LOGIST_31209"
+      ],
+      "raw_payload": {
+        "portal_url": "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=FCI_LOGIST_31209",
+        "fleet_capacity": "Minimum 80 commercial multi-axle freight carriers under ownership or legal lease",
+        "fastag_enabled": "FASTag automated toll reconciliation and IoT temperature sensors required"
+      },
+      "match_score": 89,
+      "ai_summary": {
+        "executive_summary": "Bulk foodgrain movement and reefer container transport across railway freight sidings and storage silos nationwide. 2-year tenure.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "High contract volume logistics tender with diesel price escalation indexation clauses."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000022",
+      "portal": "state_portal",
+      "tender_ref_number": "STATE/UP/2026/UPSRTC/6612",
+      "title": "Supply, Operation and Fleet Tracking with AIS-140 GPS Telematics for 120 Commercial Heavy Haulage Trucks",
+      "authority_name": "Uttar Pradesh State Road Transport Corporation (UPSRTC), Lucknow",
+      "category": "Fleet, Transport & Logistics",
+      "location_state": "Uttar Pradesh",
+      "estimated_value": 92000000,
+      "emd_amount": 1840000,
+      "published_date": "2026-11-07T12:38:06.517Z",
+      "submission_deadline": "2026-11-22T12:38:06.517Z",
+      "opening_date": "2026-11-23T12:38:06.517Z",
+      "direct_portal_url": "https://etender.up.nic.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=UPSRTC_FLEET_6612",
+      "original_document_urls": [
+        "https://etender.up.nic.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=UPSRTC_FLEET_6612"
+      ],
+      "raw_payload": {
+        "portal_url": "https://etender.up.nic.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=UPSRTC_FLEET_6612",
+        "rto_clearance": "All vehicles must possess valid national goods permits, fitness, and PUC"
+      },
+      "match_score": 92,
+      "ai_summary": {
+        "executive_summary": "Commercial haulage trucks with cloud dispatch and real-time electronic weighbridge integration for state logistics depots.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "Favorable contract for fleet owners in UP/NCR region. Zero EMD for MSME registered transporters."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000023",
+      "portal": "gem",
+      "tender_ref_number": "GEM/2026/B/8991050",
+      "title": "BharatNet Phase-III High-Speed Rural Broadband Last-Mile GPON Fiber Distribution Network & Solar OLT Nodes",
+      "authority_name": "Bharat Broadband Network Limited (BBNL) / BSNL",
+      "category": "Telecommunications & Networking",
+      "location_state": "PAN_INDIA",
+      "estimated_value": 285000000,
+      "emd_amount": 5700000,
+      "published_date": "2026-11-05T12:38:06.517Z",
+      "submission_deadline": "2026-12-04T12:38:06.517Z",
+      "opening_date": "2026-12-05T12:38:06.517Z",
+      "direct_portal_url": "https://bidplus.gem.gov.in/showbidDocument/8991050",
+      "original_document_urls": [
+        "https://bidplus.gem.gov.in/showbidDocument/8991050"
+      ],
+      "raw_payload": {
+        "portal_url": "https://bidplus.gem.gov.in/showbidDocument/8991050",
+        "dot_ip1": "Must possess valid Infrastructure Provider Category-I (IP-1) registration from DoT",
+        "make_in_india": "Class 1 local supplier preference (>50% local optical fiber manufacturing)"
+      },
+      "match_score": 96,
+      "ai_summary": {
+        "executive_summary": "Gram Panchayat optical fiber rollout covering 420 village clusters with solar-powered optical line terminals (OLT) and Wi-Fi access hotspots.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "Flagship National digital infrastructure project with prompt phased milestone disbursement."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000024",
+      "portal": "state_portal",
+      "tender_ref_number": "STATE/AP/2026/APSFL/4410",
+      "title": "Supply, Jointing, Splicing and OTDR Certification of Aerial ADSS Fiber Optics on Electrical Poles",
+      "authority_name": "Andhra Pradesh State FiberNet Limited (APSFL), Vijayawada",
+      "category": "Telecommunications & Networking",
+      "location_state": "Andhra Pradesh",
+      "estimated_value": 67000000,
+      "emd_amount": 1340000,
+      "published_date": "2026-11-06T12:38:06.517Z",
+      "submission_deadline": "2026-11-23T12:38:06.517Z",
+      "opening_date": "2026-11-24T12:38:06.517Z",
+      "direct_portal_url": "https://apeprocurement.gov.in/tenderDetails?id=APSFL_FIBER_4410",
+      "original_document_urls": [
+        "https://apeprocurement.gov.in/tenderDetails?id=APSFL_FIBER_4410"
+      ],
+      "raw_payload": {
+        "portal_url": "https://apeprocurement.gov.in/tenderDetails?id=APSFL_FIBER_4410",
+        "aerial_cabling": "Experienced in ADSS tension/suspension clamp hardware installation"
+      },
+      "match_score": 91,
+      "ai_summary": {
+        "executive_summary": "Stringing of 24-core All-Dielectric Self-Supporting (ADSS) optical cable along 33kV/11kV electrical distribution lines across 4 districts.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "High margin specialized aerial fiber installation with fast field execution timeline."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000025",
+      "portal": "gem",
+      "tender_ref_number": "GEM/2026/B/8933210",
+      "title": "Bulk Supply of Ergonomic Dual-Desk Student Furniture, Steel Almirahs and Institutional Class-1 Local Content Goods",
+      "authority_name": "Kendriya Vidyalaya Sangathan (KVS) / Navodaya Vidyalaya Samiti",
+      "category": "General Goods & MSME Supplies",
+      "location_state": "PAN_INDIA",
+      "estimated_value": 29000000,
+      "emd_amount": 580000,
+      "published_date": "2026-11-07T12:38:06.517Z",
+      "submission_deadline": "2026-11-20T12:38:06.517Z",
+      "opening_date": "2026-11-21T12:38:06.517Z",
+      "direct_portal_url": "https://bidplus.gem.gov.in/showbidDocument/8933210",
+      "original_document_urls": [
+        "https://bidplus.gem.gov.in/showbidDocument/8933210"
+      ],
+      "raw_payload": {
+        "portal_url": "https://bidplus.gem.gov.in/showbidDocument/8933210",
+        "bifma_iso": "BIFMA Level-2 certification and ISO 9001 mandatory for fabrication works",
+        "make_in_india": "100% Class-1 Local Content (>50% domestic value addition) declaration required",
+        "msme_exemption": "100% EMD fee waiver granted for Micro & Small Enterprises with Udyam registration"
+      },
+      "match_score": 98,
+      "ai_summary": {
+        "executive_summary": "Supply and on-site assembly of 15,000 dual-desk student benches and powder-coated heavy steel storage cupboards across 45 schools nationwide.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "Prime tender for MSME manufacturers. Zero EMD required; straightforward specification delivery."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000026",
+      "portal": "cppp",
+      "tender_ref_number": "CPPP/2026/DEF/TEXTILE/7723",
+      "title": "Supply of Anti-Microbial Combat Field Uniforms, Extreme Weather Ballistic Gear and Tactical Boots",
+      "authority_name": "Ministry of Defence / Ordnance Equipment Factories",
+      "category": "General Goods & MSME Supplies",
+      "location_state": "PAN_INDIA",
+      "estimated_value": 148000000,
+      "emd_amount": 2960000,
+      "published_date": "2026-11-04T12:38:06.517Z",
+      "submission_deadline": "2026-12-01T12:38:06.517Z",
+      "opening_date": "2026-12-02T12:38:06.517Z",
+      "direct_portal_url": "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=DEF_TEXTILE_7723",
+      "original_document_urls": [
+        "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=DEF_TEXTILE_7723"
+      ],
+      "raw_payload": {
+        "portal_url": "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=DEF_TEXTILE_7723",
+        "lab_test": "NABL accredited lab test report for ripstop tensile strength and colorfastness"
+      },
+      "match_score": 90,
+      "ai_summary": {
+        "executive_summary": "Supply of 60,000 sets of digital camouflage combat uniforms and composite tactical boots with anti-slip Vibram soles. 12-month delivery window.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "High contract volume for Indian textile mills and footwear manufacturers."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000027",
+      "portal": "state_portal",
+      "tender_ref_number": "STATE/WB/2026/PHED/5102",
+      "title": "Supply of High-Density Polyethylene (HDPE) Submersible Water Pumps, Ductile Iron Pipes and Gate Valves",
+      "authority_name": "Public Health Engineering Department (PHED), Government of West Bengal",
+      "category": "General Goods & MSME Supplies",
+      "location_state": "West Bengal",
+      "estimated_value": 56000000,
+      "emd_amount": 1120000,
+      "published_date": "2026-11-06T12:38:06.517Z",
+      "submission_deadline": "2026-11-26T12:38:06.517Z",
+      "opening_date": "2026-11-27T12:38:06.517Z",
+      "direct_portal_url": "https://wbtenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=WB_PHED_5102",
+      "original_document_urls": [
+        "https://wbtenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=WB_PHED_5102"
+      ],
+      "raw_payload": {
+        "portal_url": "https://wbtenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=WB_PHED_5102",
+        "bis_standard": "IS:4984 for HDPE pipes and IS:8320 for submersible pumps mandatory"
+      },
+      "match_score": 93,
+      "ai_summary": {
+        "executive_summary": "Procurement of drinking water supply machinery and heavy ductile iron pipes under Jal Jeevan Mission rural drinking water augmentation.",
+        "bid_go_no_go_recommendation": "STRONG_BID",
+        "recommendation_rationale": "Direct opportunity for pipe and pump manufacturers. MSME exemption applies."
+      },
+      "created_at": "2026-11-08T12:38:06.517Z"
     }
   ],
   "pipeline_items": [],
-  "sessions": []
+  "sessions": [
+    {
+      "token": "4d8bb17084f5996dc9ae5c3ebcdeeb6cd703f11ce5c53f57cc291ef5f707f9bd",
+      "user_id": "556fb98d-159d-46a4-be3a-bcfc3e9e70ee",
+      "created_at": "2026-11-08T12:05:12.263Z",
+      "expires_at": "2026-12-08T12:05:12.263Z"
+    }
+  ]
 }

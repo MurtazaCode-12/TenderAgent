@@ -1,6 +1,9 @@
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
+import { INITIAL_AUTHENTIC_TENDERS } from "./seed-data";
+
+export { INITIAL_AUTHENTIC_TENDERS } from "./seed-data";
 
 export interface DBUser {
   id: string;
@@ -108,189 +111,6 @@ export function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password + "_tenderops_salt_2026").digest("hex");
 }
 
-const INITIAL_AUTHENTIC_TENDERS: DBTender[] = [
-  {
-    id: "00000000-0000-0000-0000-000000000011",
-    portal: "cppp",
-    tender_ref_number: "CPPP/2026/MOHFW/HIMS/49102",
-    title: "Procurement, Implementation & Operations of Cloud Hospital Information Management System (HIMS) across 22 Central AIIMS & Central Government Hospitals",
-    authority_name: "Ministry of Health and Family Welfare (MoHFW), Nirman Bhawan, New Delhi",
-    category: "Information Technology & Software",
-    location_state: "PAN_INDIA",
-    estimated_value: 95000000, // ₹9.50 Cr
-    emd_amount: 1900000, // ₹19 Lakhs
-    published_date: new Date(Date.now() - 3 * 86400000).toISOString(),
-    submission_deadline: new Date(Date.now() + 18 * 86400000).toISOString(),
-    opening_date: new Date(Date.now() + 19 * 86400000).toISOString(),
-    direct_portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=CPPP_2026_MOHFW_49102",
-    original_document_urls: [
-      "https://eprocure.gov.in/epublish/app?page=FrontEndTenderDetailsExternal&service=page&tenderId=49102",
-    ],
-    raw_payload: {
-      portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=CPPP_2026_MOHFW_49102",
-      emd_exemption: "Applicable for Micro & Small Enterprises (MSME) under Rule 173(i) of GFR 2017",
-      technical_qualification: "CMMI Level 3 or higher in software engineering services",
-      past_experience: "Turnover of ₹3 Crores in 2 out of last 3 financial years",
-    },
-    match_score: 94,
-    ai_summary: {
-      executive_summary: "Turnkey software engineering, EHR cloud architecture, ABDM compliance, and 5-year operations across 22 Central Government civil hospitals. High value contract with strong technical weighting.",
-      bid_go_no_go_recommendation: "STRONG_BID",
-      recommendation_rationale: "Contract value falls squarely in target bracket; technical eligibility matches CMMI certifications.",
-    },
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "00000000-0000-0000-0000-000000000012",
-    portal: "gem",
-    tender_ref_number: "GEM/2026/B/8834920",
-    title: "Annual Comprehensive Maintenance Contract for Cisco Core Routing, Switching and UTM Firewall Architecture",
-    authority_name: "National Informatics Centre Services Inc. (NICSI), Ministry of Electronics and IT",
-    category: "Cyber Security & Networking",
-    location_state: "PAN_INDIA",
-    estimated_value: 12500000, // ₹1.25 Cr
-    emd_amount: 250000,
-    published_date: new Date(Date.now() - 2 * 86400000).toISOString(),
-    submission_deadline: new Date(Date.now() + 12 * 86400000).toISOString(),
-    opening_date: new Date(Date.now() + 13 * 86400000).toISOString(),
-    direct_portal_url: "https://bidplus.gem.gov.in/showbidDocument/8834920",
-    original_document_urls: [
-      "https://bidplus.gem.gov.in/showbidDocument/8834920",
-    ],
-    raw_payload: {
-      portal_url: "https://bidplus.gem.gov.in/showbidDocument/8834920",
-      sla_uptime: "99.5% uptime required with 4-hour MTTR SLA",
-      certifications: "ISO 9001:2015 and ISO 27001:2022 mandatory",
-      past_experience: "Must have executed at least 3 similar AMC contracts with government PSUs in last 5 years",
-    },
-    match_score: 87,
-    ai_summary: {
-      executive_summary: "Annual maintenance contract covering 140+ core switches, routers, and firewalls across nationwide nodal centers. Zero EMD required for MSME entities.",
-      bid_go_no_go_recommendation: "STRONG_BID",
-      recommendation_rationale: "Low barrier to entry for certified Cisco gold/premier network integrators.",
-    },
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "00000000-0000-0000-0000-000000000013",
-    portal: "state_portal",
-    tender_ref_number: "STATE/MH/2026/CIDCO/4192",
-    title: "Engineering, Procurement & Construction (EPC) of Smart Integrated Command & Control Center (ICCC)",
-    authority_name: "City and Industrial Development Corporation of Maharashtra (CIDCO), Navi Mumbai",
-    category: "Smart City & Surveillance",
-    location_state: "Maharashtra",
-    estimated_value: 78000000, // ₹7.80 Cr
-    emd_amount: 1560000,
-    published_date: new Date(Date.now() - 4 * 86400000).toISOString(),
-    submission_deadline: new Date(Date.now() + 16 * 86400000).toISOString(),
-    opening_date: new Date(Date.now() + 17 * 86400000).toISOString(),
-    direct_portal_url: "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=CIDCO_4192",
-    original_document_urls: [
-      "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=CIDCO_4192",
-    ],
-    raw_payload: {
-      portal_url: "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=CIDCO_4192",
-      contractor_class: "Registered with Maharashtra PWD in Class-I (Civil & Electrical)",
-      local_office: "Must maintain an operational regional service center in Mumbai Metropolitan Region",
-    },
-    match_score: 82,
-    ai_summary: {
-      executive_summary: "City-wide fiber backbone and 800+ AI CCTV cameras with automated number plate recognition. Attention: Requires Class-I PWD registration and regional MMR presence.",
-      bid_go_no_go_recommendation: "MODERATE_RISK",
-      recommendation_rationale: "High contract value, but requires physical civil construction partnership to fulfill PWD Class-I clause.",
-    },
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "00000000-0000-0000-0000-000000000014",
-    portal: "gem",
-    tender_ref_number: "GEM/2026/B/8941203",
-    title: "Supply, Rack-Mount Installation and 3-Year 24x7 Enterprise Support for NVIDIA H100 AI Compute Nodes",
-    authority_name: "Department of Science and Technology, Technology Bhawan, New Delhi",
-    category: "Cloud Infrastructure & Data Centers",
-    location_state: "Delhi",
-    estimated_value: 48500000, // ₹4.85 Cr
-    emd_amount: 970000,
-    published_date: new Date(Date.now() - 1 * 86400000).toISOString(),
-    submission_deadline: new Date(Date.now() + 9 * 86400000).toISOString(),
-    opening_date: new Date(Date.now() + 10 * 86400000).toISOString(),
-    direct_portal_url: "https://bidplus.gem.gov.in/showbidDocument/8941203",
-    original_document_urls: [
-      "https://bidplus.gem.gov.in/showbidDocument/8941203",
-    ],
-    raw_payload: {
-      portal_url: "https://bidplus.gem.gov.in/showbidDocument/8941203",
-      oem_authorization: "Tender-specific Manufacturer Authorization Form (MAF) from NVIDIA/Dell/HPE strictly mandatory",
-      make_in_india: "Class 1 local supplier preference (>50% local content)",
-    },
-    match_score: 96,
-    ai_summary: {
-      executive_summary: "High-performance compute expansion for National Supercomputing Mission. Direct server delivery with 3-year OEM on-site warranty. Crucial: OEM MAF letter required.",
-      bid_go_no_go_recommendation: "STRONG_BID",
-      recommendation_rationale: "Exceptional alignment with enterprise cloud & GPU server capabilities. Very high win probability.",
-    },
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "00000000-0000-0000-0000-000000000015",
-    portal: "cppp",
-    tender_ref_number: "CPPP/2026/RAIL/OPTIC/88120",
-    title: "Laying, Testing & Commissioning of 48-Core Armoured Underground Optical Fiber Cable (OFC) Along Western Railway Route",
-    authority_name: "RailTel Corporation of India Ltd",
-    category: "Telecommunications & Networking",
-    location_state: "Gujarat",
-    estimated_value: 34000000, // ₹3.40 Cr
-    emd_amount: 680000,
-    published_date: new Date(Date.now() - 5 * 86400000).toISOString(),
-    submission_deadline: new Date(Date.now() + 21 * 86400000).toISOString(),
-    opening_date: new Date(Date.now() + 22 * 86400000).toISOString(),
-    direct_portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=RAIL_OPTIC_88120",
-    original_document_urls: [
-      "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=RAIL_OPTIC_88120",
-    ],
-    raw_payload: {
-      portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=RAIL_OPTIC_88120",
-      horizontal_directional_drilling: "HDD boring machinery certified operators mandatory",
-    },
-    match_score: 74,
-    ai_summary: {
-      executive_summary: "120 km linear optical fiber trenching and splice testing along railway tracks. Requires trenchless HDD boring equipment and railway safety clearance.",
-      bid_go_no_go_recommendation: "MODERATE_RISK",
-      recommendation_rationale: "Requires specialized outdoor civil HDD equipment alongside telecom fiber testing expertise.",
-    },
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "00000000-0000-0000-0000-000000000016",
-    portal: "state_portal",
-    tender_ref_number: "KPPP/2026/BBMP/SURV/5512",
-    title: "Supply, Installation & Maintenance of AI Surveillance & Automated Traffic Enforcement Cameras across Bengaluru City",
-    authority_name: "Bruhat Bengaluru Mahanagara Palike (BBMP) & Bengaluru Traffic Police",
-    category: "Smart City & Surveillance",
-    location_state: "Karnataka",
-    estimated_value: 62000000, // ₹6.20 Cr
-    emd_amount: 1240000,
-    published_date: new Date(Date.now() - 2 * 86400000).toISOString(),
-    submission_deadline: new Date(Date.now() + 15 * 86400000).toISOString(),
-    opening_date: new Date(Date.now() + 16 * 86400000).toISOString(),
-    direct_portal_url: "https://kppp.karnataka.gov.in/portal/tenderDetails?id=BBMP_SURV_5512",
-    original_document_urls: [
-      "https://kppp.karnataka.gov.in/portal/tenderDetails?id=BBMP_SURV_5512",
-    ],
-    raw_payload: {
-      portal_url: "https://kppp.karnataka.gov.in/portal/tenderDetails?id=BBMP_SURV_5512",
-      anpr_accuracy: "98% license plate recognition accuracy under Indian weather conditions",
-    },
-    match_score: 91,
-    ai_summary: {
-      executive_summary: "400 junction AI CCTV cameras with automated e-challan generation and cloud storage. MSME bidders exempted from EMD deposit.",
-      bid_go_no_go_recommendation: "STRONG_BID",
-      recommendation_rationale: "Direct match with smart city surveillance capabilities and cloud analytics.",
-    },
-    created_at: new Date().toISOString(),
-  },
-];
-
 class DatabaseStore {
   private data: DatabaseSchema;
 
@@ -306,8 +126,24 @@ class DatabaseStore {
 
       if (fs.existsSync(DB_FILE)) {
         const raw = fs.readFileSync(DB_FILE, "utf-8");
-        const parsed = JSON.parse(raw);
+        const parsed: DatabaseSchema = JSON.parse(raw);
+
         if (parsed.tenders && parsed.tenders.length > 0) {
+          // Merge any newly introduced authentic tenders across trades
+          const existingRefs = new Set(parsed.tenders.map((t) => t.tender_ref_number));
+          let hasUpdates = false;
+
+          for (const seed of INITIAL_AUTHENTIC_TENDERS) {
+            if (!existingRefs.has(seed.tender_ref_number)) {
+              parsed.tenders.push(seed);
+              hasUpdates = true;
+            }
+          }
+
+          if (hasUpdates) {
+            fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), "utf-8");
+          }
+
           return parsed;
         }
       }
@@ -318,7 +154,7 @@ class DatabaseStore {
         companies: [],
         profiles: [],
         company_icps: [],
-        tenders: INITIAL_AUTHENTIC_TENDERS,
+        tenders: [...INITIAL_AUTHENTIC_TENDERS],
         pipeline_items: [],
         sessions: [],
       };
@@ -332,7 +168,7 @@ class DatabaseStore {
         companies: [],
         profiles: [],
         company_icps: [],
-        tenders: INITIAL_AUTHENTIC_TENDERS,
+        tenders: [...INITIAL_AUTHENTIC_TENDERS],
         pipeline_items: [],
         sessions: [],
       };
@@ -461,7 +297,7 @@ class DatabaseStore {
   public getSession(token: string): DBSession | null {
     const session = this.data.sessions.find((s) => s.token === token);
     if (!session) return null;
-    if (new Date(session.expires_at) < new Date()) {
+    if (new Date(session.expires_at).getTime() < Date.now()) {
       this.deleteSession(token);
       return null;
     }
@@ -525,7 +361,7 @@ class DatabaseStore {
   }
 
   // --------------------------------------------------------------------------
-  // TENDERS CATALOG & LIVE SEARCH
+  // TENDERS CATALOG & LIVE SEARCH (UNIVERSAL MULTI-TRADE)
   // --------------------------------------------------------------------------
 
   public getAllTenders(filters?: {
@@ -546,7 +382,37 @@ class DatabaseStore {
 
     if (filters.category && filters.category !== "all") {
       const cat = filters.category.toLowerCase();
-      result = result.filter((t) => t.category.toLowerCase().includes(cat) || t.title.toLowerCase().includes(cat));
+      result = result.filter((t) => {
+        const tCat = t.category.toLowerCase();
+        const tTitle = t.title.toLowerCase();
+
+        if (cat === "civil") {
+          return tCat.includes("civil") || tCat.includes("works") || tTitle.includes("road") || tTitle.includes("bridge") || tTitle.includes("building");
+        }
+        if (cat === "electrical_solar" || cat === "solar") {
+          return tCat.includes("solar") || tCat.includes("electric") || tTitle.includes("solar") || tTitle.includes("substation") || tTitle.includes("street light");
+        }
+        if (cat === "it_software" || cat === "it" || cat === "software") {
+          return tCat.includes("information technology") || tCat.includes("software") || tCat.includes("compute") || tTitle.includes("cloud") || tTitle.includes("hims") || tTitle.includes("firewall") || tTitle.includes("h100");
+        }
+        if (cat === "healthcare" || cat === "medical") {
+          return tCat.includes("health") || tCat.includes("medical") || tTitle.includes("aiims") || tTitle.includes("radiology") || tTitle.includes("pharmaceutical") || tTitle.includes("pathology");
+        }
+        if (cat === "facility_security" || cat === "facility" || cat === "security") {
+          return tCat.includes("facility") || tCat.includes("security") || tTitle.includes("security") || tTitle.includes("housekeeping") || tTitle.includes("sanitation") || tTitle.includes("cleaning");
+        }
+        if (cat === "fleet_logistics" || cat === "fleet" || cat === "transport" || cat === "logistics") {
+          return tCat.includes("fleet") || tCat.includes("transport") || tCat.includes("logistics") || tTitle.includes("bus") || tTitle.includes("freight") || tTitle.includes("truck");
+        }
+        if (cat === "telecom" || cat === "ofc") {
+          return tCat.includes("telecom") || tCat.includes("networking") || tTitle.includes("fiber") || tTitle.includes("ofc") || tTitle.includes("broadband") || tTitle.includes("railtel");
+        }
+        if (cat === "general_supplies" || cat === "goods" || cat === "msme") {
+          return tCat.includes("goods") || tCat.includes("supplies") || tTitle.includes("furniture") || tTitle.includes("uniform") || tTitle.includes("pump") || tTitle.includes("pipes");
+        }
+
+        return tCat.includes(cat) || tTitle.includes(cat);
+      });
     }
 
     if (filters.query) {

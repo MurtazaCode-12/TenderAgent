@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   Sparkles,
+  FileText,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -22,6 +23,11 @@ const NAV_ITEMS = [
     label: "Discovery Feed",
     icon: Compass,
     badge: "Live",
+  },
+  {
+    href: "/draft-bid",
+    label: "AI Bid Drafter",
+    icon: FileText,
   },
   {
     href: "/pipeline",
@@ -34,8 +40,13 @@ const NAV_ITEMS = [
     icon: FileCheck2,
   },
   {
+    href: "/whatsapp-demo",
+    label: "WhatsApp SDR",
+    icon: Smartphone,
+  },
+  {
     href: "/settings",
-    label: "Profile & Settings",
+    label: "Settings",
     icon: Sliders,
   },
 ];
@@ -96,14 +107,18 @@ export function MainNavigation() {
         {/* Right Actions: WhatsApp SDR status & User Menu */}
         <div className="hidden md:flex items-center gap-4">
           {/* WhatsApp SDR Live Indicator */}
-          <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50/80 px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">
+          <Link
+            href="/whatsapp-demo"
+            className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50/80 hover:bg-emerald-50/80 hover:border-emerald-200 px-3 py-1 text-xs font-medium text-slate-700 hover:text-emerald-800 shadow-sm transition"
+            title="Open Interactive WhatsApp SDR Simulation"
+          >
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
             <Smartphone className="h-3.5 w-3.5 text-emerald-600" />
             <span>WhatsApp SDR Live</span>
-          </div>
+          </Link>
 
           <form action={signOutAction}>
             <button
