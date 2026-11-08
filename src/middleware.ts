@@ -1,6 +1,7 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { checkRateLimit } from "@/lib/rate-limiter";
+
+const SESSION_COOKIE_NAME = "tenderops_session";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -8,7 +9,6 @@ export async function middleware(request: NextRequest) {
 
   // 1. Rate Limiting for API routes
   if (pathname.startsWith("/api")) {
-    // Exempt webhooks and cron from standard user IP rate limits
     const isWebhook = pathname.startsWith("/api/webhooks") || pathname.startsWith("/api/cron");
     if (!isWebhook) {
       const isAI = pathname.startsWith("/api/compliance");
@@ -26,78 +26,56 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 2. Supabase Auth Session Refresh & Route Protection
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+  // 2. Authentication and Onboarding Gate Check
+  const hasAppSession = request.cookies.has(SESSION_COOKIE_NAME);
+  // Also check for Supabase auth cookie if present
+  const hasSupabaseCookie = request.cookies
+    .getAll()
+    .some((c) => c.name.startsWith("sb-") && c.name.endsWith("-auth-token"));
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const isAuthenticated = hasAppSession || hasSupabaseCookie;
 
-  const isSupabaseReady =
-    supabaseUrl &&
-    supabaseAnonKey &&
-    !supabaseUrl.includes("your-project") &&
-    !supabaseAnonKey.includes("your-");
+  const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/onboarding");
+  const isDashboardRoute =
+    pathname === "/" ||
+    pathname.startsWith("/tenders") ||
+    pathname.startsWith("/pipeline") ||
+    pathname.startsWith("/compliance") ||
+    pathname.startsWith("/settings");
 
-  if (!isSupabaseReady) {
-    // If Supabase credentials are placeholder in local development, allow exploratory access
-    return response;
+  // If root "/" and authenticated -> redirect to /tenders
+  if (pathname === "/") {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = isAuthenticated ? "/tenders" : "/register";
+    return NextResponse.redirect(redirectUrl);
   }
 
-  try {
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
-      },
-    });
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register");
-    const isDashboardRoute =
-      pathname.startsWith("/tenders") ||
-      pathname.startsWith("/pipeline") ||
-      pathname.startsWith("/compliance") ||
-      pathname.startsWith("/settings");
-
-    // Redirect unauthenticated users attempting to access dashboard
-    if (!user && isDashboardRoute) {
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = "/login";
-      return NextResponse.redirect(redirectUrl);
-    }
-
-    // Redirect authenticated users away from auth pages
-    if (user && isAuthRoute) {
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = "/tenders";
-      return NextResponse.redirect(redirectUrl);
-    }
-  } catch (authErr) {
-    console.warn("[Middleware Auth Check Warning]:", authErr);
+  // If unauthenticated trying to access any dashboard route -> Redirect to /register (Profile Setup)
+  if (!isAuthenticated && isDashboardRoute) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = "/register";
+    return NextResponse.redirect(redirectUrl);
   }
 
-  return response;
+  // If authenticated user tries to visit /login or /register -> Redirect to /tenders
+  if (isAuthenticated && isAuthRoute) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = "/tenders";
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
+    /*
+     * Match all request paths except for:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico, sitemap.xml, robots.txt
+     * - public files (svg, png, jpg, etc.)
+     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db/store";
+import { getCurrentUser } from "@/actions/auth";
 import { generateEmbedding } from "@/lib/ai/config";
 import { ICPFormSchema } from "@/types";
 
@@ -15,22 +17,8 @@ const DEFAULT_DEMO_COMPANY_ID = "00000000-0000-0000-0000-000000000001";
 
 export async function saveICPAction(formData: FormData): Promise<SaveICPResult> {
   try {
-    const supabase = await createServerSupabaseClient();
-    let companyId = DEFAULT_DEMO_COMPANY_ID;
-
-    // Check for authenticated user session
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("company_id")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (profile?.company_id) {
-        companyId = profile.company_id;
-      }
-    }
+    const currentUser = await getCurrentUser();
+    let companyId = currentUser?.company?.id || DEFAULT_DEMO_COMPANY_ID;
 
     const rawCategories = (formData.get("target_categories") as string) || "";
     const rawStates = (formData.get("preferred_states") as string) || "";
@@ -56,7 +44,21 @@ export async function saveICPAction(formData: FormData): Promise<SaveICPResult> 
 
     const icpData = parsed.data;
 
-    // 1. Generate 1536-dimensional vector embedding for semantic matching
+    // 1. Update in Database Store
+    db.updateCompanyICP(companyId, {
+      title: icpData.title,
+      target_categories: icpData.target_categories,
+      min_tender_value: icpData.min_tender_value,
+      max_tender_value: icpData.max_tender_value,
+      preferred_states: icpData.preferred_states,
+      excluded_keywords: icpData.excluded_keywords,
+      required_certifications: icpData.required_certifications,
+      min_annual_turnover: icpData.min_annual_turnover,
+      max_emd_capacity: icpData.max_emd_capacity,
+      icp_summary: icpData.icp_summary,
+    });
+
+    // 2. Generate vector embedding for semantic matching
     let embeddingVector: number[] | null = null;
     try {
       const textToEmbed = `${icpData.title}. Target Categories: ${icpData.target_categories.join(", ")}. Operating States: ${icpData.preferred_states.join(", ")}. Core Competencies: ${icpData.icp_summary}`;
@@ -65,32 +67,32 @@ export async function saveICPAction(formData: FormData): Promise<SaveICPResult> 
       console.warn("[ICP Embedding Generation Warning]: AI embedding unavailable, falling back to keyword heuristics", err);
     }
 
-    // 2. Upsert into Supabase company_icps
-    const { error: upsertErr } = await supabase.from("company_icps").upsert(
-      {
-        company_id: companyId,
-        title: icpData.title,
-        target_categories: icpData.target_categories,
-        min_tender_value: icpData.min_tender_value,
-        max_tender_value: icpData.max_tender_value,
-        preferred_states: icpData.preferred_states,
-        excluded_keywords: icpData.excluded_keywords,
-        required_certifications: icpData.required_certifications,
-        min_annual_turnover: icpData.min_annual_turnover,
-        max_emd_capacity: icpData.max_emd_capacity,
-        icp_summary: icpData.icp_summary,
-        embedding: embeddingVector ? JSON.stringify(embeddingVector) : null,
-        is_active: true,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "company_id" }
-    );
-
-    if (upsertErr) {
-      console.warn("[saveICPAction] DB warning:", upsertErr.message);
+    // 3. Upsert into Supabase if connected
+    try {
+      const supabase = await createServerSupabaseClient();
+      await (supabase.from("company_icps") as any).upsert(
+        {
+          company_id: companyId,
+          title: icpData.title,
+          target_categories: icpData.target_categories,
+          min_tender_value: icpData.min_tender_value,
+          max_tender_value: icpData.max_tender_value,
+          preferred_states: icpData.preferred_states,
+          excluded_keywords: icpData.excluded_keywords,
+          required_certifications: icpData.required_certifications,
+          min_annual_turnover: icpData.min_annual_turnover,
+          max_emd_capacity: icpData.max_emd_capacity,
+          icp_summary: icpData.icp_summary,
+          embedding: embeddingVector ? JSON.stringify(embeddingVector) : null,
+          is_active: true,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "company_id" }
+      );
+    } catch (sbErr) {
+      // Non-blocking
     }
 
-    // 3. Revalidate dashboard routes
     revalidatePath("/settings");
     revalidatePath("/tenders");
     revalidatePath("/pipeline");

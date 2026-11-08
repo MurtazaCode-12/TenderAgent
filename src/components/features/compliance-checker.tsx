@@ -165,7 +165,7 @@ export function ComplianceCheckerUI({ initialTenderId, initialTitle }: Complianc
         setAuditResult(fallbackAudit);
         setPiiCount(5);
         toast({
-          type: "warning",
+          type: "info",
           title: "Audit Completed (82% Compliance)",
           description: "2 missing mandatory annexures flagged for remediation.",
         });

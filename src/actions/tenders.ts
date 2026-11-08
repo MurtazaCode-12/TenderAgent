@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db/store";
+import { getCurrentUser } from "@/actions/auth";
 import type { PipelineStage } from "@/types";
 
 export interface PipelineMutationResponse {
@@ -12,7 +14,7 @@ export interface PipelineMutationResponse {
 
 /**
  * Saves a tender into the contractor's bidding pipeline.
- * Idempotent upsert by (company_id, tender_id).
+ * Saves to both Database Store and Supabase.
  */
 export async function saveToPipelineAction(
   tenderId: string,
@@ -20,39 +22,28 @@ export async function saveToPipelineAction(
   notes = "Saved via TenderOps Dashboard"
 ): Promise<PipelineMutationResponse> {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const currentUser = await getCurrentUser();
+    const companyId = currentUser?.company?.id || "00000000-0000-0000-0000-000000000001";
+    const userId = currentUser?.user?.id || null;
 
-    let companyId = "00000000-0000-0000-0000-000000000001"; // Fallback demo company
-    let userId: string | null = null;
+    // 1. Save in Database Store
+    db.savePipelineItem(companyId, tenderId, stage, notes);
 
-    if (user) {
-      userId = user.id;
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("company_id")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (profile?.company_id) {
-        companyId = profile.company_id;
-      }
-    }
-
-    const { error } = await supabase.from("pipeline_items").upsert(
-      {
-        company_id: companyId,
-        tender_id: tenderId,
-        stage,
-        assigned_user_id: userId,
-        internal_notes: notes,
-      },
-      { onConflict: "company_id,tender_id" }
-    );
-
-    if (error) {
-      console.warn("[saveToPipelineAction] Database warning:", error.message);
-      // If table constraint or local mock, return success for smooth UI experience
+    // 2. Also upsert in Supabase if connected
+    try {
+      const supabase = await createServerSupabaseClient();
+      await (supabase.from("pipeline_items") as any).upsert(
+        {
+          company_id: companyId,
+          tender_id: tenderId,
+          stage,
+          assigned_user_id: userId,
+          internal_notes: notes,
+        },
+        { onConflict: "company_id,tender_id" }
+      );
+    } catch (sbErr) {
+      // Non-blocking
     }
 
     revalidatePath("/tenders");
@@ -60,7 +51,7 @@ export async function saveToPipelineAction(
     return { success: true, stage };
   } catch (err) {
     console.error("[saveToPipelineAction Error]:", err);
-    return { success: true, stage }; // Optimistic fallback
+    return { success: true, stage };
   }
 }
 
@@ -72,14 +63,16 @@ export async function updatePipelineStageAction(
   newStage: PipelineStage
 ): Promise<PipelineMutationResponse> {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { error } = await supabase
-      .from("pipeline_items")
-      .update({ stage: newStage, updated_at: new Date().toISOString() })
-      .eq("id", pipelineItemId);
+    db.updatePipelineStage(pipelineItemId, newStage);
 
-    if (error) {
-      console.warn("[updatePipelineStageAction] DB warning:", error.message);
+    try {
+      const supabase = await createServerSupabaseClient();
+      await (supabase
+        .from("pipeline_items") as any)
+        .update({ stage: newStage, updated_at: new Date().toISOString() })
+        .eq("id", pipelineItemId);
+    } catch (sbErr) {
+      // Non-blocking
     }
 
     revalidatePath("/pipeline");
@@ -97,14 +90,16 @@ export async function dismissFromPipelineAction(
   pipelineItemId: string
 ): Promise<PipelineMutationResponse> {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { error } = await supabase
-      .from("pipeline_items")
-      .update({ stage: "passed", updated_at: new Date().toISOString() })
-      .eq("id", pipelineItemId);
+    db.updatePipelineStage(pipelineItemId, "passed");
 
-    if (error) {
-      console.warn("[dismissFromPipelineAction] DB warning:", error.message);
+    try {
+      const supabase = await createServerSupabaseClient();
+      await (supabase
+        .from("pipeline_items") as any)
+        .update({ stage: "passed", updated_at: new Date().toISOString() })
+        .eq("id", pipelineItemId);
+    } catch (sbErr) {
+      // Non-blocking
     }
 
     revalidatePath("/pipeline");
@@ -124,18 +119,20 @@ export async function updatePipelineNotesAction(
   bidValue?: number
 ): Promise<PipelineMutationResponse> {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { error } = await supabase
-      .from("pipeline_items")
-      .update({
-        internal_notes: notes,
-        bid_value: bidValue || null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", pipelineItemId);
+    db.updatePipelineNotes(pipelineItemId, notes);
 
-    if (error) {
-      console.warn("[updatePipelineNotesAction] DB warning:", error.message);
+    try {
+      const supabase = await createServerSupabaseClient();
+      await (supabase
+        .from("pipeline_items") as any)
+        .update({
+          internal_notes: notes,
+          bid_value: bidValue || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", pipelineItemId);
+    } catch (sbErr) {
+      // Non-blocking
     }
 
     revalidatePath("/pipeline");

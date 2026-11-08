@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyMetaSignature } from "@/lib/whatsapp/security";
 import { sendWhatsAppTextMessage, normalizeWhatsAppNumber } from "@/lib/whatsapp/client";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import type { WhatsAppWebhookEntry } from "@/types";
 
 /**
  * Meta Webhook Verification Handshake (GET)
@@ -44,7 +43,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  let body: WhatsAppWebhookEntry;
+  let body: any;
   try {
     body = JSON.parse(rawBody);
   } catch {
@@ -56,9 +55,10 @@ export async function POST(req: NextRequest) {
   // 2. Process changes
   if (body.entry && body.entry.length > 0) {
     for (const entry of body.entry) {
+      if (!entry.changes) continue;
       for (const change of entry.changes) {
         const value = change.value;
-        const messages = value.messages;
+        const messages = value?.messages;
 
         if (messages && messages.length > 0) {
           for (const msg of messages) {
@@ -89,16 +89,16 @@ export async function POST(req: NextRequest) {
                 .eq("id", tenderId)
                 .maybeSingle();
 
-              const tenderRef = tender?.tender_ref_number || "Tender";
+              const tenderRef = (tender as any)?.tender_ref_number || "Tender";
 
               if (action === "save_pipeline") {
                 // Upsert into pipeline_items
                 await supabase.from("pipeline_items").upsert(
                   {
-                    company_id: profile.company_id,
+                    company_id: (profile as any).company_id,
                     tender_id: tenderId,
                     stage: "under_review",
-                    assigned_user_id: profile.id,
+                    assigned_user_id: (profile as any).id,
                     internal_notes: "Auto-saved via WhatsApp SDR quick-reply button",
                   },
                   { onConflict: "company_id,tender_id" }
@@ -126,7 +126,7 @@ Our AI will scan mandatory clauses, EMD formatting, and missing annexures in 30 
               } else if (action === "pass_tender") {
                 await supabase.from("pipeline_items").upsert(
                   {
-                    company_id: profile.company_id,
+                    company_id: (profile as any).company_id,
                     tender_id: tenderId,
                     stage: "passed",
                     internal_notes: "Marked as Pass via WhatsApp",

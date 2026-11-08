@@ -18,6 +18,7 @@ import {
   BookmarkPlus,
   Loader2,
   Clock,
+  Globe,
 } from "lucide-react";
 
 export interface TenderCardData {
@@ -32,6 +33,7 @@ export interface TenderCardData {
   submission_deadline: string;
   published_date?: string;
   opening_date?: string | null;
+  direct_portal_url?: string;
   original_document_urls?: string[];
   raw_payload?: Record<string, unknown>;
   match_score: number;
@@ -42,6 +44,32 @@ export interface TenderCardData {
   };
 }
 
+function getDirectPortalUrl(tender: TenderCardData): string {
+  if (tender.direct_portal_url && tender.direct_portal_url.startsWith("http")) {
+    return tender.direct_portal_url;
+  }
+  if (tender.original_document_urls && tender.original_document_urls.length > 0 && tender.original_document_urls[0].startsWith("http")) {
+    return tender.original_document_urls[0];
+  }
+  const cleanRef = tender.tender_ref_number.replace(/[^0-9]/g, "");
+  const p = tender.portal.toLowerCase();
+  if (p === "gem") {
+    return `https://bidplus.gem.gov.in/showbidDocument/${cleanRef || "8941203"}`;
+  }
+  if (p === "cppp") {
+    return `https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=${encodeURIComponent(tender.tender_ref_number)}`;
+  }
+  return `https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=${encodeURIComponent(tender.tender_ref_number)}`;
+}
+
+function getPortalLabel(portal: string): string {
+  const p = portal.toLowerCase();
+  if (p === "gem") return "GeM Bidplus";
+  if (p === "cppp") return "CPPP eProcure";
+  if (p === "state_portal") return "State Portal";
+  return portal.toUpperCase();
+}
+
 export function TenderCard({ tender }: { tender: TenderCardData }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -50,6 +78,8 @@ export function TenderCard({ tender }: { tender: TenderCardData }) {
 
   const scoreBadge = getScoreBadge(tender.match_score);
   const deadlineInfo = getDaysRemaining(tender.submission_deadline);
+  const directUrl = getDirectPortalUrl(tender);
+  const portalLabel = getPortalLabel(tender.portal);
 
   const handleSaveToPipeline = () => {
     startTransition(async () => {
@@ -84,12 +114,28 @@ export function TenderCard({ tender }: { tender: TenderCardData }) {
       {/* Top Meta Bar */}
       <div className="flex flex-wrap items-center justify-between gap-2 pb-2">
         <div className="flex items-center gap-2">
-          <span className="rounded-md bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-slate-700">
-            {tender.portal.toUpperCase()}
-          </span>
-          <span className="text-xs font-mono text-slate-400">
+          {/* Direct link on portal badge */}
+          <a
+            href={directUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-md bg-blue-50 hover:bg-blue-100 border border-blue-200/60 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-700 transition"
+            title={`View official listing on ${portalLabel}`}
+          >
+            <Globe className="h-3 w-3" />
+            <span>{portalLabel}</span>
+            <ExternalLink className="h-2.5 w-2.5" />
+          </a>
+
+          <a
+            href={directUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-mono text-slate-500 hover:text-blue-600 transition"
+            title="Open official tender notice"
+          >
             {tender.tender_ref_number}
-          </span>
+          </a>
         </div>
 
         {/* AI Match Score Badge */}
@@ -101,99 +147,153 @@ export function TenderCard({ tender }: { tender: TenderCardData }) {
         </div>
       </div>
 
-      {/* Tender Title */}
-      <h2 className="mt-2 text-lg font-bold text-slate-900 leading-snug tracking-tight hover:text-emerald-700 transition">
-        {tender.title}
+      {/* Main Title - Clickable directly to portal */}
+      <h2 className="mt-2 text-base font-bold text-slate-900 leading-snug">
+        <a
+          href={directUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-emerald-700 hover:underline transition inline-flex items-baseline gap-1.5"
+          title={`Click to open official tender page on ${portalLabel}`}
+        >
+          <span>{tender.title}</span>
+          <ExternalLink className="h-3.5 w-3.5 shrink-0 text-slate-400 self-center" />
+        </a>
       </h2>
 
-      {/* Authority & Category */}
-      <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-slate-500">
-        <span className="flex items-center gap-1 font-medium text-slate-700">
+      {/* Authority Name & Category */}
+      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+        <span className="flex items-center gap-1">
           <Building2 className="h-3.5 w-3.5 text-slate-400" />
           {tender.authority_name}
         </span>
         <span>•</span>
-        <span>{tender.category}</span>
+        <span className="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
+          {tender.category}
+        </span>
       </div>
 
-      {/* Highlighted Plain-Language AI Summary */}
-      <div className="mt-4 rounded-xl border border-emerald-100/90 bg-emerald-50/40 p-4">
-        <div className="flex items-center justify-between gap-2 pb-1.5">
-          <span className="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
-            <ShieldCheck className="h-4 w-4 text-emerald-600" />
-            Plain-Language AI Brief:
+      {/* Highlighted Plain-Language AI Summary Box */}
+      <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50 p-4">
+        <div className="flex items-center justify-between pb-1.5">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1">
+            <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
+            Plain-Language AI Brief
           </span>
+
           {tender.ai_summary.bid_go_no_go_recommendation && (
             <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
+              className={`rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider ${
                 tender.ai_summary.bid_go_no_go_recommendation === "STRONG_BID"
-                  ? "bg-emerald-100 text-emerald-800"
-                  : "bg-amber-100 text-amber-800"
+                  ? "bg-emerald-600 text-white"
+                  : "bg-amber-500 text-white"
               }`}
             >
-              {tender.ai_summary.bid_go_no_go_recommendation.replace("_", " ")}
+              {tender.ai_summary.bid_go_no_go_recommendation.replace(/_/g, " ")}
             </span>
           )}
         </div>
-        <p className="text-xs text-slate-700 leading-relaxed font-normal">
+
+        <p className="text-xs leading-relaxed text-slate-700">
           {tender.ai_summary.executive_summary}
         </p>
+
         {tender.ai_summary.recommendation_rationale && (
-          <p className="mt-2 text-[11px] font-medium text-emerald-800">
-            💡 {tender.ai_summary.recommendation_rationale}
+          <p className="mt-2 text-[11px] text-emerald-900/80 font-medium border-t border-emerald-200/50 pt-1.5">
+            <strong>AI Rationale:</strong> {tender.ai_summary.recommendation_rationale}
           </p>
         )}
       </div>
 
-      {/* Key Stats Row: Value, EMD, Deadline, Time Left */}
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 rounded-xl bg-slate-50/80 p-3.5 text-xs border border-slate-100">
+      {/* 4-Stat High-Legibility Metrics Strip */}
+      <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2.5 rounded-xl border border-slate-100 bg-slate-50/60 p-3">
         <div>
-          <span className="text-[11px] text-slate-400 font-medium flex items-center gap-0.5">
-            <IndianRupee className="h-3 w-3" /> Estimated Value
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-600 block">
+            Estimated Value
           </span>
-          <p className="mt-0.5 font-bold text-slate-900 text-sm">
+          <span className="text-sm font-extrabold text-slate-900">
             {formatINR(tender.estimated_value)}
-          </p>
+          </span>
         </div>
 
         <div>
-          <span className="text-[11px] text-slate-400 font-medium">EMD Amount</span>
-          <p className="mt-0.5 font-semibold text-slate-800">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-600 block">
+            EMD Deposit
+          </span>
+          <span className="text-sm font-extrabold text-slate-900">
             {formatINR(tender.emd_amount)}
-          </p>
+          </span>
         </div>
 
         <div>
-          <span className="text-[11px] text-slate-400 font-medium flex items-center gap-1">
-            <Calendar className="h-3 w-3" /> Due Date
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-600 block">
+            Closing Date
           </span>
-          <p className="mt-0.5 font-semibold text-slate-800">
+          <span className="text-xs font-semibold text-slate-900 block truncate">
             {formatTenderDate(tender.submission_deadline).split(",")[0]}
-          </p>
+          </span>
         </div>
 
         <div>
-          <span className="text-[11px] text-slate-400 font-medium flex items-center gap-1">
-            <Clock className="h-3 w-3" /> Countdown
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-600 block">
+            Time Left
           </span>
-          <p className={`mt-0.5 font-bold ${deadlineInfo.isUrgent ? "text-rose-600" : "text-emerald-700"}`}>
+          <span
+            className={`text-xs font-bold inline-flex items-center gap-1 ${
+              deadlineInfo.isUrgent ? "text-rose-600 font-extrabold" : "text-emerald-700"
+            }`}
+          >
+            <Clock className="h-3 w-3" />
             {deadlineInfo.label}
-          </p>
+          </span>
         </div>
       </div>
 
-      {/* Expandable Bureaucratic Details Accordion */}
+      {/* Expandable Bureaucratic / Raw Technical Specifications Drawer */}
       {detailsOpen && (
-        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/50 p-4 text-xs space-y-3 animate-in fade-in-50 duration-200">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="mt-4 space-y-3 rounded-xl border border-slate-200 bg-slate-50/80 p-4 text-xs">
+          {/* Direct Government Portal Banner */}
+          <div className="rounded-lg bg-blue-50 border border-blue-200 p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
-              <span className="font-semibold text-slate-700">Tender ID / Ref:</span>
-              <p className="font-mono text-slate-600 mt-0.5">{tender.tender_ref_number}</p>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-900 block">
+                Official Listing on {portalLabel}
+              </span>
+              <p className="text-xs text-blue-800 font-mono truncate max-w-md">
+                {directUrl}
+              </p>
+            </div>
+            <a
+              href={directUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700 transition shrink-0"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              Open Portal Page
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600">
+            <div>
+              <span className="font-semibold text-slate-700">Tender Reference ID:</span>{" "}
+              <span className="font-mono text-slate-900">{tender.tender_ref_number}</span>
             </div>
             <div>
-              <span className="font-semibold text-slate-700">Issuing Department:</span>
-              <p className="text-slate-600 mt-0.5">{tender.authority_name}</p>
+              <span className="font-semibold text-slate-700">Procuring Authority:</span>{" "}
+              {tender.authority_name}
             </div>
+            {tender.published_date && (
+              <div>
+                <span className="font-semibold text-slate-700">Notice Published:</span>{" "}
+                {formatTenderDate(tender.published_date)}
+              </div>
+            )}
+            {tender.opening_date && (
+              <div>
+                <span className="font-semibold text-slate-700">Technical Bid Opening:</span>{" "}
+                {formatTenderDate(tender.opening_date)}
+              </div>
+            )}
           </div>
 
           {tender.raw_payload && Object.keys(tender.raw_payload).length > 0 && (
@@ -244,7 +344,19 @@ export function TenderCard({ tender }: { tender: TenderCardData }) {
           )}
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Prominent Direct Portal Link Button */}
+          <a
+            href={directUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 px-3.5 py-2 text-xs font-bold text-blue-700 hover:text-blue-800 transition shadow-2xs"
+            title={`Go directly to tender page on ${portalLabel}`}
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            <span>Go to {portalLabel} Listing</span>
+          </a>
+
           <Link
             href={`/compliance?tenderId=${tender.id}&title=${encodeURIComponent(tender.title)}`}
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"

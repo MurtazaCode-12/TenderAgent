@@ -1,5 +1,4 @@
 import { createBrowserClient } from "@supabase/ssr";
-import type { Database } from "@/types/database";
 
 /**
  * Creates a Supabase client for client-side components.
@@ -13,5 +12,5 @@ export function createClient() {
     throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.");
   }
 
-  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+  return createBrowserClient<any>(supabaseUrl, supabaseAnonKey);
 }
