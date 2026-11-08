@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
 
   // 1. Rate Limiting for API routes
   if (pathname.startsWith("/api")) {
-    // Exempt webhooks and cron from standard user IP rate limits (they have their own signature/secret checks)
+    // Exempt webhooks and cron from standard user IP rate limits
     const isWebhook = pathname.startsWith("/api/webhooks") || pathname.startsWith("/api/cron");
     if (!isWebhook) {
       const isAI = pathname.startsWith("/api/compliance");
@@ -36,51 +36,61 @@ export async function middleware(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    // If Supabase not yet configured, allow dev exploration
+  const isSupabaseReady =
+    supabaseUrl &&
+    supabaseAnonKey &&
+    !supabaseUrl.includes("your-project") &&
+    !supabaseAnonKey.includes("your-");
+
+  if (!isSupabaseReady) {
+    // If Supabase credentials are placeholder in local development, allow exploratory access
     return response;
   }
 
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
+  try {
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.next({
+            request,
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
+        },
       },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({
-          request,
-        });
-        cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options)
-        );
-      },
-    },
-  });
+    });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register");
-  const isDashboardRoute =
-    pathname.startsWith("/tenders") ||
-    pathname.startsWith("/pipeline") ||
-    pathname.startsWith("/compliance") ||
-    pathname.startsWith("/settings");
+    const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register");
+    const isDashboardRoute =
+      pathname.startsWith("/tenders") ||
+      pathname.startsWith("/pipeline") ||
+      pathname.startsWith("/compliance") ||
+      pathname.startsWith("/settings");
 
-  // Redirect unauthenticated users attempting to access dashboard
-  if (!user && isDashboardRoute) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
-    return NextResponse.redirect(redirectUrl);
-  }
+    // Redirect unauthenticated users attempting to access dashboard
+    if (!user && isDashboardRoute) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/login";
+      return NextResponse.redirect(redirectUrl);
+    }
 
-  // Redirect authenticated users away from auth pages
-  if (user && isAuthRoute) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/tenders";
-    return NextResponse.redirect(redirectUrl);
+    // Redirect authenticated users away from auth pages
+    if (user && isAuthRoute) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/tenders";
+      return NextResponse.redirect(redirectUrl);
+    }
+  } catch (authErr) {
+    console.warn("[Middleware Auth Check Warning]:", authErr);
   }
 
   return response;
