@@ -151,14 +151,21 @@ export function RegisterForm() {
     formData.append("email", email.trim());
     formData.append("password", password);
     formData.append("full_name", fullName.trim());
+    formData.append("fullName", fullName.trim());
     formData.append("company_name", companyName.trim());
+    formData.append("companyName", companyName.trim());
     formData.append("phone_number", phoneNumber.trim());
+    formData.append("phoneNumber", phoneNumber.trim());
     formData.append("min_tender_value", String(minTenderValue));
+    formData.append("minTenderValue", String(minTenderValue));
     if (maxTenderValue) {
       formData.append("max_tender_value", String(maxTenderValue));
+      formData.append("maxTenderValue", String(maxTenderValue));
     }
     formData.append("trades", JSON.stringify(allTrades));
+    formData.append("targetCategories", JSON.stringify(allTrades));
     formData.append("preferred_states", JSON.stringify(selectedStates));
+    formData.append("preferredStates", JSON.stringify(selectedStates));
     formData.append("certifications", JSON.stringify(selectedCerts));
 
     startTransition(async () => {

@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 import crypto from "crypto";
 import { INITIAL_AUTHENTIC_TENDERS } from "./seed-data";
 
@@ -145,7 +146,10 @@ export interface DatabaseSchema {
   whatsapp_logs: DBWhatsAppLog[];
 }
 
-const DB_DIR = path.join(process.cwd(), "data");
+const IS_SERVERLESS = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const SEED_DIR = path.join(process.cwd(), "data");
+const SEED_FILE = path.join(SEED_DIR, "tenderops.db.json");
+const DB_DIR = IS_SERVERLESS ? path.join(os.tmpdir(), "tenderops_data") : SEED_DIR;
 const DB_FILE = path.join(DB_DIR, "tenderops.db.json");
 
 // Helper to hash passwords using SHA-256 + salt
@@ -163,11 +167,18 @@ class DatabaseStore {
   private loadDatabase(): DatabaseSchema {
     try {
       if (!fs.existsSync(DB_DIR)) {
-        fs.mkdirSync(DB_DIR, { recursive: true });
+        try {
+          fs.mkdirSync(DB_DIR, { recursive: true });
+        } catch {
+          // ignore read-only parent folder errors
+        }
       }
 
-      if (fs.existsSync(DB_FILE)) {
-        const raw = fs.readFileSync(DB_FILE, "utf-8");
+      // Check writable DB_FILE first, fallback to read-only pre-bundled SEED_FILE
+      const sourceFile = fs.existsSync(DB_FILE) ? DB_FILE : (fs.existsSync(SEED_FILE) ? SEED_FILE : null);
+
+      if (sourceFile) {
+        const raw = fs.readFileSync(sourceFile, "utf-8");
         const parsed: DatabaseSchema = JSON.parse(raw);
 
         if (parsed.tenders && parsed.tenders.length > 0) {
@@ -186,7 +197,11 @@ class DatabaseStore {
           }
 
           if (hasUpdates) {
-            fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), "utf-8");
+            try {
+              fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), "utf-8");
+            } catch {
+              // Non-blocking in ephemeral environments
+            }
           }
 
           return parsed;
@@ -206,7 +221,11 @@ class DatabaseStore {
         whatsapp_logs: [],
       };
 
-      fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2), "utf-8");
+      try {
+        fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2), "utf-8");
+      } catch {
+        // Non-blocking
+      }
       return initial;
     } catch (err) {
       console.warn("[DatabaseStore load warning]:", err);
@@ -227,11 +246,15 @@ class DatabaseStore {
   private saveDatabase(): void {
     try {
       if (!fs.existsSync(DB_DIR)) {
-        fs.mkdirSync(DB_DIR, { recursive: true });
+        try {
+          fs.mkdirSync(DB_DIR, { recursive: true });
+        } catch {
+          // ignore
+        }
       }
       fs.writeFileSync(DB_FILE, JSON.stringify(this.data, null, 2), "utf-8");
     } catch (err) {
-      console.error("[DatabaseStore save error]:", err);
+      console.warn("[DatabaseStore save warning]:", err);
     }
   }
 
@@ -340,6 +363,16 @@ class DatabaseStore {
 
   public verifyPassword(user: DBUser, passwordAttempt: string): boolean {
     return user.password_hash === hashPassword(passwordAttempt);
+  }
+
+  public verifyUserPassword(identifier: string, passwordAttempt: string): DBUser | null {
+    const user = this.getUserByEmailOrUsername(identifier);
+    if (!user) return null;
+    return this.verifyPassword(user, passwordAttempt) ? user : null;
+  }
+
+  public getAllUsers(): DBUser[] {
+    return [...this.data.users];
   }
 
   public createSession(userId: string): DBSession {

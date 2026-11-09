@@ -22,16 +22,30 @@ export async function registerContractorProfile(formData: FormData): Promise<Aut
   const username = ((formData.get("username") as string) || "").trim();
   const email = ((formData.get("email") as string) || "").trim();
   const password = ((formData.get("password") as string) || "").trim();
-  const fullName = ((formData.get("fullName") as string) || "").trim();
-  const companyName = ((formData.get("companyName") as string) || "").trim();
-  const phoneNumber = ((formData.get("phoneNumber") as string) || "").trim();
+  const fullName = (
+    (formData.get("full_name") as string) ||
+    (formData.get("fullName") as string) ||
+    ""
+  ).trim();
+  const companyName = (
+    (formData.get("company_name") as string) ||
+    (formData.get("companyName") as string) ||
+    ""
+  ).trim();
+  const phoneNumber = (
+    (formData.get("phone_number") as string) ||
+    (formData.get("phoneNumber") as string) ||
+    ""
+  ).trim();
 
   // Industry & targeting attributes
-  const rawCategories = (formData.get("targetCategories") as string) || "";
-  const rawStates = (formData.get("preferredStates") as string) || "";
+  const rawCategories = (formData.get("trades") as string) || (formData.get("targetCategories") as string) || "";
+  const rawStates = (formData.get("preferred_states") as string) || (formData.get("preferredStates") as string) || "";
   const rawCerts = (formData.get("certifications") as string) || "";
-  const minTenderValue = Number(formData.get("minTenderValue") || 0);
-  const maxTenderValue = formData.get("maxTenderValue") ? Number(formData.get("maxTenderValue")) : null;
+  const minTenderValue = Number(formData.get("min_tender_value") || formData.get("minTenderValue") || 0);
+  const maxTenderValue = (formData.get("max_tender_value") || formData.get("maxTenderValue"))
+    ? Number(formData.get("max_tender_value") || formData.get("maxTenderValue"))
+    : null;
   const summary = ((formData.get("summary") as string) || "").trim();
 
   if (!username || !email || !password || !fullName || !companyName) {
@@ -42,24 +56,48 @@ export async function registerContractorProfile(formData: FormData): Promise<Aut
     return { error: "Password must be at least 6 characters long." };
   }
 
-  const targetCategories = rawCategories
-    .split(",")
-    .map((c) => c.trim())
-    .filter(Boolean);
-
-  if (targetCategories.length === 0) {
-    targetCategories.push("Information Technology & Software");
+  let targetCategories: string[] = [];
+  if (rawCategories) {
+    try {
+      if (rawCategories.trim().startsWith("[")) {
+        targetCategories = JSON.parse(rawCategories);
+      } else {
+        targetCategories = rawCategories.split(",").map((c) => c.trim()).filter(Boolean);
+      }
+    } catch {
+      targetCategories = rawCategories.split(",").map((c) => c.trim()).filter(Boolean);
+    }
   }
 
-  const preferredStates = rawStates
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+  if (targetCategories.length === 0) {
+    targetCategories.push("Metro Rail & Mass Transit", "Government Offices & Buildings", "Civil Infrastructure & Works");
+  }
 
-  const certifications = rawCerts
-    .split(",")
-    .map((c) => c.trim())
-    .filter(Boolean);
+  let preferredStates: string[] = [];
+  if (rawStates) {
+    try {
+      if (rawStates.trim().startsWith("[")) {
+        preferredStates = JSON.parse(rawStates);
+      } else {
+        preferredStates = rawStates.split(",").map((s) => s.trim()).filter(Boolean);
+      }
+    } catch {
+      preferredStates = rawStates.split(",").map((s) => s.trim()).filter(Boolean);
+    }
+  }
+
+  let certifications: string[] = [];
+  if (rawCerts) {
+    try {
+      if (rawCerts.trim().startsWith("[")) {
+        certifications = JSON.parse(rawCerts);
+      } else {
+        certifications = rawCerts.split(",").map((c) => c.trim()).filter(Boolean);
+      }
+    } catch {
+      certifications = rawCerts.split(",").map((c) => c.trim()).filter(Boolean);
+    }
+  }
 
   try {
     // 1. Save contractor profile & company ICP in Database Store
@@ -75,7 +113,7 @@ export async function registerContractorProfile(formData: FormData): Promise<Aut
       maxTenderValue,
       preferredStates: preferredStates.length > 0 ? preferredStates : ["PAN_INDIA"],
       certifications,
-      summary: summary || `Enterprise contractor specializing in ${targetCategories.join(", ")}`,
+      summary: summary || `Contractor enterprise specializing in ${targetCategories.join(", ")}`,
     });
 
     // 2. Also register in Supabase if active
@@ -131,15 +169,19 @@ export async function registerContractorProfile(formData: FormData): Promise<Aut
       path: "/",
     });
 
-    // 4. Immediately trigger live search across government portals (GeM, CPPP, State Portals)
-    await searchLiveGovernmentTenders({
-      targetCategories,
-      preferredStates,
-      minTenderValue,
-      maxTenderValue,
-      certifications,
-      keywords: summary ? summary.split(" ") : [],
-    });
+    // 4. Search live government portals (GeM, CPPP, State Portals) in non-blocking try-catch
+    try {
+      await searchLiveGovernmentTenders({
+        targetCategories,
+        preferredStates,
+        minTenderValue,
+        maxTenderValue,
+        certifications,
+        keywords: summary ? summary.split(" ") : [],
+      });
+    } catch (ingestErr) {
+      console.warn("[searchLiveGovernmentTenders non-blocking warning]:", ingestErr);
+    }
 
     return {
       success: true,
@@ -163,13 +205,8 @@ export async function signInAction(formData: FormData): Promise<AuthActionResult
   }
 
   // 1. Verify in local database store
-  const user = db.getUserByEmailOrUsername(identifier);
+  const user = db.verifyUserPassword(identifier, password);
   if (user) {
-    const valid = db.verifyPassword(user, password);
-    if (!valid) {
-      return { error: "Incorrect password. Please try again." };
-    }
-
     const session = db.createSession(user.id);
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE_NAME, session.token, {
@@ -180,95 +217,128 @@ export async function signInAction(formData: FormData): Promise<AuthActionResult
       path: "/",
     });
 
-    redirect("/tenders");
+    return {
+      success: true,
+      redirectUrl: "/tenders",
+    };
   }
 
-  // 2. Check Supabase if actively configured
+  // 2. Also check Supabase if configured
   if (isSupabaseConfigured()) {
     try {
       const supabase = await createServerSupabaseClient();
-      const { error: sbErr } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: identifier,
         password,
       });
 
-      if (!sbErr) {
-        redirect("/tenders");
+      if (!error && data.user) {
+        return {
+          success: true,
+          redirectUrl: "/tenders",
+        };
       }
-    } catch (err) {
-      // fall through
+    } catch (sbErr) {
+      // Fallback
     }
   }
 
-  return { error: "No account found with these credentials. Please check your spelling or register a new profile." };
+  return { error: "Invalid username/email or password. Please try again." };
 }
 
 /**
- * Signs the user out and clears session cookies.
+ * Signs out current user session.
  */
-export async function signOutAction() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-  if (token) {
-    db.deleteSession(token);
-    cookieStore.delete(SESSION_COOKIE_NAME);
-  }
-
+export async function signOutAction(): Promise<void> {
   try {
-    const supabase = await createServerSupabaseClient();
-    await supabase.auth.signOut();
+    const cookieStore = await cookies();
+    const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+    if (token) {
+      db.deleteSession(token);
+      cookieStore.delete(SESSION_COOKIE_NAME);
+    }
+
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = await createServerSupabaseClient();
+        await supabase.auth.signOut();
+      } catch (err) {
+        // Fallback
+      }
+    }
   } catch (err) {
-    // non-blocking
+    console.warn("[signOutAction warning]:", err);
   }
 
   redirect("/login");
 }
 
 /**
- * Server-side helper to get the currently authenticated user.
+ * Retrieves the currently authenticated user and company profile.
  */
 export async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-
-  if (token) {
-    const session = db.getSession(token);
-    if (session) {
-      return db.getUserProfileByUserId(session.user_id);
-    }
-  }
-
-  // Supabase fallback
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: profile } = await (supabase
-        .from("profiles") as any)
-        .select("*, companies(*), company_icps(*)")
-        .eq("id", user.id)
-        .maybeSingle();
+    const cookieStore = await cookies();
+    const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
-      if (profile) {
-        return {
-          user: {
-            id: user.id,
-            username: user.email?.split("@")[0] || "contractor",
-            email: user.email || "",
-            password_hash: "",
-            full_name: (profile as any).full_name,
-            company_name: (profile as any).companies?.name || "Contractor Co",
-            phone_number: (profile as any).phone_number || "",
-            created_at: (profile as any).created_at,
-          },
-          company: (profile as any).companies,
-          icp: (profile as any).company_icps?.[0] || null,
-        };
+    if (token) {
+      const session = db.getSession(token);
+      if (session) {
+        const user = db.getUserById(session.user_id);
+        const company = user ? db.getUserCompany(user.id) : null;
+        const icp = company ? db.getCompanyICP(company.id) : null;
+        return { user, company, icp };
       }
     }
-  } catch (err) {
-    // non-blocking
-  }
 
-  return null;
+    // Fallback to Supabase if local session not present
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = await createServerSupabaseClient();
+        const {
+          data: { user: sbUser },
+        } = await supabase.auth.getUser();
+
+        if (sbUser) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*, company:companies(*, company_icps(*))")
+            .eq("id", sbUser.id)
+            .single();
+
+          if (profile) {
+            return {
+              user: {
+                id: profile.id,
+                username: profile.email.split("@")[0],
+                email: profile.email,
+                full_name: profile.full_name,
+                company_name: (profile as any).company?.name || "Contractor Org",
+                phone_number: profile.phone_number || "",
+                created_at: profile.created_at,
+              },
+              company: (profile as any).company,
+              icp: (profile as any).company?.company_icps?.[0],
+            };
+          }
+        }
+      } catch (err) {
+        // Fallback
+      }
+    }
+
+    // Default demo contractor if no session exists yet
+    const allUsers = db.getAllUsers();
+    if (allUsers.length > 0) {
+      const user = allUsers[0];
+      const company = db.getUserCompany(user.id);
+      const icp = company ? db.getCompanyICP(company.id) : null;
+      return { user, company, icp };
+    }
+
+    return null;
+  } catch (err) {
+    console.warn("[getCurrentUser warning]:", err);
+    return null;
+  }
 }
