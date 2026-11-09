@@ -118,7 +118,81 @@ export default async function TendersDiscoveryPage({ searchParams }: DiscoveryPa
       const catLower = item.category.toLowerCase();
       const titleLower = item.title.toLowerCase();
 
-      if (selectedCategory === "civil") {
+      if (selectedCategory === "metro_transit" || selectedCategory === "metro") {
+        if (
+          !catLower.includes("metro") &&
+          !catLower.includes("transit") &&
+          !titleLower.includes("metro") &&
+          !titleLower.includes("viaduct") &&
+          !titleLower.includes("dmrc") &&
+          !titleLower.includes("mmrda") &&
+          !titleLower.includes("bmrcl") &&
+          !titleLower.includes("cmrl") &&
+          !titleLower.includes("gmrc") &&
+          !titleLower.includes("bullet") &&
+          !titleLower.includes("traction") &&
+          !titleLower.includes("fare collection") &&
+          !titleLower.includes("nhsrcl")
+        )
+          return false;
+      } else if (selectedCategory === "govt_offices" || selectedCategory === "offices" || selectedCategory === "bhavan") {
+        if (
+          !catLower.includes("office") &&
+          !catLower.includes("bhavan") &&
+          !titleLower.includes("office") &&
+          !titleLower.includes("bhavan") &&
+          !titleLower.includes("secretariat") &&
+          !titleLower.includes("collectorate") &&
+          !titleLower.includes("cpwd") &&
+          !titleLower.includes("nbcc") &&
+          !titleLower.includes("court") &&
+          !titleLower.includes("workstation") &&
+          !titleLower.includes("interior") &&
+          !titleLower.includes("administrative")
+        )
+          return false;
+      } else if (selectedCategory === "railways_stations" || selectedCategory === "railways" || selectedCategory === "stations") {
+        if (
+          !catLower.includes("railway") &&
+          !catLower.includes("station") &&
+          !titleLower.includes("railway") &&
+          !titleLower.includes("amrit bharat") &&
+          !titleLower.includes("rlda") &&
+          !titleLower.includes("rvnl") &&
+          !titleLower.includes("ircon") &&
+          !titleLower.includes("concourse") &&
+          !titleLower.includes("ohe") &&
+          !titleLower.includes("doubling")
+        )
+          return false;
+      } else if (selectedCategory === "airports_aviation" || selectedCategory === "airport") {
+        if (
+          !catLower.includes("airport") &&
+          !catLower.includes("aviation") &&
+          !titleLower.includes("airport") &&
+          !titleLower.includes("aai") &&
+          !titleLower.includes("runway") &&
+          !titleLower.includes("terminal") &&
+          !titleLower.includes("aerobridge") &&
+          !titleLower.includes("airfield")
+        )
+          return false;
+      } else if (selectedCategory === "water_smartcities" || selectedCategory === "water" || selectedCategory === "smartcity") {
+        if (
+          !catLower.includes("water") &&
+          !catLower.includes("smart") &&
+          !titleLower.includes("water") &&
+          !titleLower.includes("sewage") &&
+          !titleLower.includes("stp") &&
+          !titleLower.includes("wtp") &&
+          !titleLower.includes("nmcg") &&
+          !titleLower.includes("ganga") &&
+          !titleLower.includes("jal") &&
+          !titleLower.includes("iccc") &&
+          !titleLower.includes("surveillance")
+        )
+          return false;
+      } else if (selectedCategory === "civil") {
         if (!catLower.includes("civil") && !catLower.includes("works") && !titleLower.includes("road") && !titleLower.includes("bridge") && !titleLower.includes("building")) return false;
       } else if (selectedCategory === "electrical_solar" || selectedCategory === "solar") {
         if (!catLower.includes("solar") && !catLower.includes("electric") && !titleLower.includes("solar") && !titleLower.includes("substation") && !titleLower.includes("led")) return false;

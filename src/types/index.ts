@@ -168,7 +168,7 @@ export interface ApiResponse<T = unknown> {
 
 
 // ============================================================================
-// Universal Contractor Trades Catalog (All Trades Coverage)
+// Universal Contractor Trades Catalog (All Government Project Sectors)
 // ============================================================================
 
 export interface ContractorTradeInfo {
@@ -184,14 +184,64 @@ export interface ContractorTradeInfo {
 
 export const CONTRACTOR_TRADES: ContractorTradeInfo[] = [
   {
+    id: "metro_transit",
+    label: "Metro Rail & Mass Transit",
+    shortLabel: "Metro & Transit",
+    icon: "🚇",
+    categoryName: "Metro Rail & Mass Transit",
+    qualTag: "DMRC / RDSO / Metro Corp",
+    description: "Viaducts, Underground Stations, 25kV Traction Power, Signaling, AFC Gates & Rolling Stock AMC",
+    mandatoryDocs: ["Metro Corporation Empanelment", "RDSO / Metro Safety Clearance", "Specialized Heavy Lift & Tunnel Experience"],
+  },
+  {
+    id: "govt_offices",
+    label: "Government Offices & Bhavans",
+    shortLabel: "Govt Offices & Bhavans",
+    icon: "🏛️",
+    categoryName: "Government Offices & Buildings",
+    qualTag: "CPWD / NBCC Class-I Enlistment",
+    description: "Secretariats, Central Bhavans, High Courts, District Collectorates, Modular Interiores & BMS",
+    mandatoryDocs: ["CPWD / NBCC Class-I Composite Registration", "GRIHA / IGBC Green Building Rating Proof", "Fire Safety NOC & Bank Solvency"],
+  },
+  {
+    id: "railways_stations",
+    label: "Railways & Station Redevelopment",
+    shortLabel: "Railways & Stations",
+    icon: "🚆",
+    categoryName: "Railways & Station Redevelopment",
+    qualTag: "IREPS / Amrit Bharat Station",
+    description: "Amrit Bharat Station Complexes, Air Concourses, 25kV Electrification, Track Doubling, Signalling",
+    mandatoryDocs: ["IREPS Vendor Registration", "Railway Category Track / OHE Experience", "Labor Law Compliance Undertaking"],
+  },
+  {
     id: "civil",
-    label: "Civil & Infrastructure",
+    label: "Civil Infrastructure & Highways",
     shortLabel: "Civil & Infra",
     icon: "🏗️",
     categoryName: "Civil Infrastructure & Works",
     qualTag: "PWD Class 1-A & Hot-Mix",
-    description: "Highways, Bridges, PWD Buildings, Bituminous Overlay, Stormwater Drainage",
+    description: "Highways, Expressways, Bridges, PWD Roads, Bituminous Overlay, Stormwater Drainage",
     mandatoryDocs: ["PWD/CPWD Class Registration", "Batch Mix Plant Ownership/Lease", "Bank Solvency Certificate"],
+  },
+  {
+    id: "airports_aviation",
+    label: "Airports & Aviation Infrastructure",
+    shortLabel: "Airports & Aviation",
+    icon: "✈️",
+    categoryName: "Airports & Aviation Infrastructure",
+    qualTag: "AAI Empanelled & BCAS Clearance",
+    description: "Terminal Buildings, Runway Resurfacing, Airfield Ground Lighting (AGL), Aerobridges & Baggage Systems",
+    mandatoryDocs: ["AAI Enlistment Certificate", "BCAS Security Clearance", "Specialized Airfield Paving Credentials"],
+  },
+  {
+    id: "water_smartcities",
+    label: "Water Supply & Smart Cities",
+    shortLabel: "Water & Smart Cities",
+    icon: "💧",
+    categoryName: "Water Supply & Smart Cities",
+    qualTag: "Jal Jeevan Mission & ICCC",
+    description: "Water Treatment Plants (WTP), Sewage Treatment (STP), DI Pipeline Networks, Citywide ICCC Centers",
+    mandatoryDocs: ["Jal Jeevan Mission Empanelment", "Water Supply Hydro-Testing Clearance", "Smart City System Integrator ISO 20000"],
   },
   {
     id: "electrical_solar",

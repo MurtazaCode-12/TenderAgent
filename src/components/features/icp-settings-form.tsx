@@ -37,7 +37,12 @@ export interface ICPSettingsData {
 }
 
 const COMMON_TRADES = [
+  "Metro Rail & Mass Transit",
+  "Government Offices & Bhavans",
+  "Railways & Station Redevelopment",
   "Civil Infrastructure & Works",
+  "Airports & Aviation Infrastructure",
+  "Water Supply & Smart Cities",
   "Electrical & Solar Power",
   "Information Technology & Software",
   "Healthcare & Medical Equipment",

@@ -750,4 +750,502 @@ export const INITIAL_AUTHENTIC_TENDERS: DBTender[] = [
     },
     created_at: new Date().toISOString(),
   },
+
+  // ==========================================================================
+  // 9. METRO RAIL & MASS RAPID TRANSIT (MRTS)
+  // ==========================================================================
+  {
+    id: "00000000-0000-0000-0000-000000000030",
+    portal: "cppp",
+    tender_ref_number: "DMRC/2026/ELECT/PH4/OHE/8190",
+    title: "Design, Supply, Installation, Testing & Commissioning of 25 kV Overhead Equipment (OHE), 33 kV Auxiliary Substation & SCADA System for Phase-IV Extensions",
+    authority_name: "Delhi Metro Rail Corporation Ltd (DMRC)",
+    category: "Metro Rail & Mass Transit",
+    location_state: "Delhi",
+    estimated_value: 1850000000, // ₹185.00 Cr
+    emd_amount: 37000000,
+    published_date: new Date(Date.now() - 2 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 32 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 33 * 86400000).toISOString(),
+    direct_portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=DMRC_ELECT_PH4_OHE_2026",
+    original_document_urls: [
+      "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=DMRC_ELECT_PH4_OHE_2026",
+    ],
+    raw_payload: {
+      portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=DMRC_ELECT_PH4_OHE_2026",
+      specialization: "RDSO / Metro approved electrical traction contractor",
+      past_experience: "Completion of at least 20 route-km of 25kV AC traction in metro or railway mainline",
+      solvency: "Bank Solvency Certificate of minimum ₹40 Crores",
+    },
+    match_score: 96,
+    ai_summary: {
+      executive_summary: "Flagship DMRC Phase-IV 25 kV AC flexible and rigid overhead catenary electrification across 28.5 route-km with SCADA telemetry control rooms.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "High contract value metro electrification project. Milestone escrow payments backed by DMRC and Ministry of Housing and Urban Affairs.",
+    },
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000031",
+    portal: "state_portal",
+    tender_ref_number: "MMRDA/METRO4/CIVIL/STN/2026/4102",
+    title: "Architectural Station Finishing, Roofing, False Ceiling, Granite Flooring, Façade & MEP Works for 7 Elevated Stations on Line 4 (Wadala-Kasarvadavali)",
+    authority_name: "Maha Mumbai Metro Operation Corporation (MMMOCL / MMRDA)",
+    category: "Metro Rail & Mass Transit",
+    location_state: "Maharashtra",
+    estimated_value: 1425000000, // ₹142.50 Cr
+    emd_amount: 28500000,
+    published_date: new Date(Date.now() - 3 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 27 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 28 * 86400000).toISOString(),
+    direct_portal_url: "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=MMRDA_METRO4_FINISH_8821",
+    original_document_urls: [
+      "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=MMRDA_METRO4_FINISH_8821",
+    ],
+    raw_payload: {
+      portal_url: "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=MMRDA_METRO4_FINISH_8821",
+      finishing_scope: "Structural glazing, aluminum louvers, vitrified flooring, public address, firefighting & MEP",
+      valid_registration: "Class 1(A) civil contractor registered with PWD Maharashtra, CPWD, or equivalent Metro authority",
+    },
+    match_score: 94,
+    ai_summary: {
+      executive_summary: "Comprehensive architectural and interior station finishing for 7 elevated metro stations on Mumbai Metro Line 4 corridor including standing seam roofing and tactile paving.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "Lucrative urban transit station finishing contract. High priority transit corridor under rapid development.",
+    },
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000032",
+    portal: "state_portal",
+    tender_ref_number: "BMRCL/2026/PH2B/AIRPORT/PKG-02",
+    title: "Construction of Elevated Viaduct and 5 Elevated Metro Stations (Hebbal to Bagalur Cross) for Bangalore Metro Phase-2B (Airport Link)",
+    authority_name: "Bangalore Metro Rail Corporation Limited (BMRCL - Namma Metro)",
+    category: "Metro Rail & Mass Transit",
+    location_state: "Karnataka",
+    estimated_value: 3200000000, // ₹320.00 Cr
+    emd_amount: 64000000,
+    published_date: new Date(Date.now() - 5 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 35 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 36 * 86400000).toISOString(),
+    direct_portal_url: "https://eproc.karnataka.gov.in/eprocurement/secure/tenderDetails?id=BMRCL_PH2B_VIADUCT_2026",
+    original_document_urls: [
+      "https://eproc.karnataka.gov.in/eprocurement/secure/tenderDetails?id=BMRCL_PH2B_VIADUCT_2026",
+    ],
+    raw_payload: {
+      portal_url: "https://eproc.karnataka.gov.in/eprocurement/secure/tenderDetails?id=BMRCL_PH2B_VIADUCT_2026",
+      segmental_launching: "Contractor must deploy at least 2 launching girders for precast segmental box girder erection",
+      turnover: "Average annual turnover of ₹250 Crores over the last 3 financial years",
+    },
+    match_score: 92,
+    ai_summary: {
+      executive_summary: "Bangalore Metro Phase-2B Airport line construction: 11.2 km elevated viaduct with segment casting yard, pile foundations, pier caps, and 5 station structures.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "Mega-scale national infrastructure tender. Joint Ventures (JV) allowed up to 3 partners.",
+    },
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000033",
+    portal: "state_portal",
+    tender_ref_number: "CMRL/PH2/C4/TVS-ECS/2026",
+    title: "Design, Manufacture, Supply, Installation, Testing and Commissioning of Tunnel Ventilation System (TVS) and Environmental Control System (ECS) for Corridor-4 Underground Sections",
+    authority_name: "Chennai Metro Rail Limited (CMRL)",
+    category: "Metro Rail & Mass Transit",
+    location_state: "Tamil Nadu",
+    estimated_value: 960000000, // ₹96.00 Cr
+    emd_amount: 19200000,
+    published_date: new Date(Date.now() - 1 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 29 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 30 * 86400000).toISOString(),
+    direct_portal_url: "https://tenders.tn.gov.in/app?page=FrontEndTenderDetailsExternal&tnid=CMRL_TVS_ECS_CORR4_2026",
+    original_document_urls: [
+      "https://tenders.tn.gov.in/app?page=FrontEndTenderDetailsExternal&tnid=CMRL_TVS_ECS_CORR4_2026",
+    ],
+    raw_payload: {
+      portal_url: "https://tenders.tn.gov.in/app?page=FrontEndTenderDetailsExternal&tnid=CMRL_TVS_ECS_CORR4_2026",
+      fans_spec: "High-temperature jet fans rated for 250°C for 2 hours during emergency smoke clearance",
+    },
+    match_score: 91,
+    ai_summary: {
+      executive_summary: "Underground tunnel ventilation system, air-cooled chillers, air handling units (AHUs), and emergency dampers for 12 underground stations on Chennai Metro Phase 2.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "Highly specialized electromechanical HVAC/TVS work with high margin margins.",
+    },
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000034",
+    portal: "gem",
+    tender_ref_number: "GEM/2026/B/9521040",
+    title: "Annual Maintenance Contract (AMC) & Hardware Overhaul for Automatic Fare Collection (AFC) Flap Barriers, QR Readers, and NCMC Smart Card Validators",
+    authority_name: "Gujarat Metro Rail Corporation (GMRC) Limited",
+    category: "Metro Rail & Mass Transit",
+    location_state: "Gujarat",
+    estimated_value: 285000000, // ₹28.50 Cr
+    emd_amount: 5700000,
+    published_date: new Date(Date.now() - 4 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 21 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 22 * 86400000).toISOString(),
+    direct_portal_url: "https://bidplus.gem.gov.in/showbidDocument/9521040",
+    original_document_urls: [
+      "https://bidplus.gem.gov.in/showbidDocument/9521040",
+    ],
+    raw_payload: {
+      portal_url: "https://bidplus.gem.gov.in/showbidDocument/9521040",
+      ncmc_spec: "NPCI certified EMV / RuPay contact and contactless transit certified",
+      msme_exemption: "Eligible for 100% EMD waiver under GFR 173(i)",
+    },
+    match_score: 93,
+    ai_summary: {
+      executive_summary: "3-year comprehensive operational maintenance and spare parts supply for 320 AFC barrier gates across Ahmedabad Metro and Surat Metro networks.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "Predictable recurring revenue model with quarterly SLA-based payments.",
+    },
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000035",
+    portal: "cppp",
+    tender_ref_number: "NHSRCL/MAHSR/CIVIL/PKG-C5/2026",
+    title: "Construction of Prestressed Concrete (PSC) Box Girder Viaducts, River Bridges and Station Substructures for Mumbai-Ahmedabad High Speed Rail (MAHSR) Project",
+    authority_name: "National High Speed Rail Corporation Limited (NHSRCL - Bullet Train)",
+    category: "Metro Rail & Mass Transit",
+    location_state: "Gujarat",
+    estimated_value: 5800000000, // ₹580.00 Cr
+    emd_amount: 116000000,
+    published_date: new Date(Date.now() - 6 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 45 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 46 * 86400000).toISOString(),
+    direct_portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=NHSRCL_MAHSR_PKG_C5_2026",
+    original_document_urls: [
+      "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=NHSRCL_MAHSR_PKG_C5_2026",
+    ],
+    raw_payload: {
+      portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=NHSRCL_MAHSR_PKG_C5_2026",
+      standards: "Japan International Consultants (JICA) / Shinkansen technical specifications",
+      jv_allowed: "Consortium of up to 3 partners with lead member having at least 51% stake",
+    },
+    match_score: 95,
+    ai_summary: {
+      executive_summary: "High-speed rail viaduct and bridge construction for India's first Bullet Train corridor. Strict JICA safety, high-grade concrete (M60) and laser-guided girder launching.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "Flagship national prestige project with secured multi-lateral funding.",
+    },
+    created_at: new Date().toISOString(),
+  },
+
+  // ==========================================================================
+  // 10. GOVERNMENT OFFICES, CENTRAL BHAVANS, SECRETARIATS & JUDICIARY
+  // ==========================================================================
+  {
+    id: "00000000-0000-0000-0000-000000000036",
+    portal: "cppp",
+    tender_ref_number: "CPWD/2026/BHAVAN/CENTRAL/1180",
+    title: "Construction of Composite Central Government Multi-Storey Office Complex (Bhavan) with IGBC Platinum Green Rating, Solar Integrated Façade & Building Management System",
+    authority_name: "Central Public Works Department (CPWD), Director General Office",
+    category: "Government Offices & Buildings",
+    location_state: "Delhi",
+    estimated_value: 2150000000, // ₹215.00 Cr
+    emd_amount: 43000000,
+    published_date: new Date(Date.now() - 2 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 30 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 31 * 86400000).toISOString(),
+    direct_portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=CPWD_CENTRAL_BHAVAN_OFFICES_2026",
+    original_document_urls: [
+      "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=CPWD_CENTRAL_BHAVAN_OFFICES_2026",
+    ],
+    raw_payload: {
+      portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=CPWD_CENTRAL_BHAVAN_OFFICES_2026",
+      enlistment: "Class-I (Super Composite) CPWD Enlistment mandatory",
+      green_rating: "IGBC Platinum or GRIHA 4-Star certification commitment",
+    },
+    match_score: 97,
+    ai_summary: {
+      executive_summary: "Construction of a state-of-the-art 12-storey Central Government Administrative Bhavan featuring double basement parking, central VRV HVAC, IBMS automation, and 450 kWp solar canopy.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "Flagship central administrative complex with clear milestone disbursements and advance mobilization.",
+    },
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000037",
+    portal: "cppp",
+    tender_ref_number: "NBCC/2026/CIVIL/SECRETARIAT/0912",
+    title: "Turnkey Design, Engineering, Procurement & Construction (EPC) of State Administrative Secretariat & Integrated Directorate Office Towers",
+    authority_name: "NBCC (India) Limited, Civil Engineering Zone",
+    category: "Government Offices & Buildings",
+    location_state: "Uttar Pradesh",
+    estimated_value: 3100000000, // ₹310.00 Cr
+    emd_amount: 62000000,
+    published_date: new Date(Date.now() - 4 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 34 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 35 * 86400000).toISOString(),
+    direct_portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=NBCC_SECRETARIAT_OFFICE_2026",
+    original_document_urls: [
+      "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=NBCC_SECRETARIAT_OFFICE_2026",
+    ],
+    raw_payload: {
+      portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=NBCC_SECRETARIAT_OFFICE_2026",
+      epc_model: "Lump-sum turnkey EPC contract with 30-month defect liability period",
+      structural_system: "Structural steel composite columns with cast-in-situ post-tensioned RCC slabs",
+    },
+    match_score: 94,
+    ai_summary: {
+      executive_summary: "Comprehensive EPC project for twin 16-storey State Directorate Office Towers, ministerial chambers, digital press conference halls, and integrated multi-tier security campus.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "High-value public building project backed by state capital works fund and NBCC escrow management.",
+    },
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000038",
+    portal: "state_portal",
+    tender_ref_number: "PWD/MH/2026/DIST/COURT/4491",
+    title: "Construction of New Integrated District Collectorate Office & Judicial Magistrate Court Complex with Multi-Level Car Parking and Solar Rooftop",
+    authority_name: "Public Works Department (PWD), Government of Maharashtra",
+    category: "Government Offices & Buildings",
+    location_state: "Maharashtra",
+    estimated_value: 880000000, // ₹88.00 Cr
+    emd_amount: 17600000,
+    published_date: new Date(Date.now() - 3 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 24 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 25 * 86400000).toISOString(),
+    direct_portal_url: "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=PWD_MH_COLLECTORATE_COURT_2026",
+    original_document_urls: [
+      "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=PWD_MH_COLLECTORATE_COURT_2026",
+    ],
+    raw_payload: {
+      portal_url: "https://mahatenders.gov.in/nicgep/app?page=FrontEndTenderDetailsExternal&tenderId=PWD_MH_COLLECTORATE_COURT_2026",
+      class_pwd: "Class 1(A) PWD Maharashtra registration mandatory",
+      courtrooms: "18 air-conditioned courtrooms with soundproofing, acoustic wall paneling & witness recording systems",
+    },
+    match_score: 93,
+    ai_summary: {
+      executive_summary: "Combined administrative campus housing District Collectorate revenue wings, treasury office, sub-registrar desks, and 18 judicial courtrooms with multi-level parking.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "District headquarters civil project with strong state budget allocation.",
+    },
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000039",
+    portal: "state_portal",
+    tender_ref_number: "BBMP/2026/CIVIL/OFFICE/RENOV/710",
+    title: "Modernization, Civil Renovation, Modular Workstation Fit-Out, Access Control & Fire Suppression for Zonal Municipal Administrative Offices",
+    authority_name: "Bruhat Bengaluru Mahanagara Palike (BBMP) / Municipal Corporation",
+    category: "Government Offices & Buildings",
+    location_state: "Karnataka",
+    estimated_value: 184000000, // ₹18.40 Cr
+    emd_amount: 3680000,
+    published_date: new Date(Date.now() - 1 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 19 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 20 * 86400000).toISOString(),
+    direct_portal_url: "https://eproc.karnataka.gov.in/eprocurement/secure/tenderDetails?id=BBMP_ZONAL_OFFICE_RENOV_2026",
+    original_document_urls: [
+      "https://eproc.karnataka.gov.in/eprocurement/secure/tenderDetails?id=BBMP_ZONAL_OFFICE_RENOV_2026",
+    ],
+    raw_payload: {
+      portal_url: "https://eproc.karnataka.gov.in/eprocurement/secure/tenderDetails?id=BBMP_ZONAL_OFFICE_RENOV_2026",
+      interiors: "BIFMA certified ergonomic chairs, powder coated acoustic modular screens & Cat-6A structured cabling",
+    },
+    match_score: 91,
+    ai_summary: {
+      executive_summary: "Complete interior renovation of 8 municipal ward administrative headquarters including citizen facilitation centers, executive offices, and centralized server rooms.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "Ideal for commercial interior fit-out contractors. MSME EMD exemption supported.",
+    },
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000040",
+    portal: "gem",
+    tender_ref_number: "GEM/2026/B/9284710",
+    title: "Turnkey Corporate Interior Fit-Out, Modular Workstations, Smart Conference AV Systems, Access Control & Central HVAC for Income Tax Central Revenue Building",
+    authority_name: "Income Tax Department / Central Board of Direct Taxes (CBDT)",
+    category: "Government Offices & Buildings",
+    location_state: "PAN_INDIA",
+    estimated_value: 342000000, // ₹34.20 Cr
+    emd_amount: 6840000,
+    published_date: new Date(Date.now() - 2 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 22 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 23 * 86400000).toISOString(),
+    direct_portal_url: "https://bidplus.gem.gov.in/showbidDocument/9284710",
+    original_document_urls: [
+      "https://bidplus.gem.gov.in/showbidDocument/9284710",
+    ],
+    raw_payload: {
+      portal_url: "https://bidplus.gem.gov.in/showbidDocument/9284710",
+      workstations_count: "850 modular linear workstations with acoustic modesty panels and wire management ducts",
+      msme_exemption: "100% EMD exemption valid under GFR Rule 173(i) for Udyam registered bidders",
+    },
+    match_score: 95,
+    ai_summary: {
+      executive_summary: "Comprehensive turnkey office outfitting for 8 floors of newly erected Central Revenue Towers. Includes 4K interactive video conference rooms, access turnstiles, and biometric access.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "High-value GeM tender with zero EMD for MSME suppliers and prompt GeM payment processing.",
+    },
+    created_at: new Date().toISOString(),
+  },
+
+  // ==========================================================================
+  // 11. RAILWAYS & AMRIT BHARAT STATION REDEVELOPMENT
+  // ==========================================================================
+  {
+    id: "00000000-0000-0000-0000-000000000041",
+    portal: "state_portal",
+    tender_ref_number: "RLDA/2026/AMRIT/STN/0488",
+    title: "Major Redevelopment of A-Category Junction Railway Station under Amrit Bharat Station Scheme with 72m Wide Roof Concourse, Foot Over Bridges, Multi-Modal Transit Hub & Modern Passenger Lounges",
+    authority_name: "Rail Land Development Authority (RLDA) / Indian Railways",
+    category: "Railways & Station Redevelopment",
+    location_state: "Uttar Pradesh",
+    estimated_value: 1750000000, // ₹175.00 Cr
+    emd_amount: 35000000,
+    published_date: new Date(Date.now() - 4 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 31 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 32 * 86400000).toISOString(),
+    direct_portal_url: "https://www.ireps.gov.in/eps/tenderDetails?id=RLDA_AMRIT_BHARAT_2026",
+    original_document_urls: [
+      "https://www.ireps.gov.in/eps/tenderDetails?id=RLDA_AMRIT_BHARAT_2026",
+    ],
+    raw_payload: {
+      portal_url: "https://www.ireps.gov.in/eps/tenderDetails?id=RLDA_AMRIT_BHARAT_2026",
+      concourse_area: "72m wide air concourse spanning across all railway platform tracks without train traffic disruption",
+      railway_emp: "Contractors must have valid IREPS registration and experience in operating railway environments",
+    },
+    match_score: 96,
+    ai_summary: {
+      executive_summary: "Transformational redevelopment under Indian Railways flagship Amrit Bharat scheme: massive roof concourse, heritage façade preservation, 12 escalators, 8 passenger elevators, and solar canopy.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "National priority infrastructure scheme with dedicated Ministry of Railways funding.",
+    },
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000042",
+    portal: "cppp",
+    tender_ref_number: "RVNL/2026/RAIL/ELECT/DOUBLING/319",
+    title: "25 kV Railway Overhead Electrification (OHE), Signalling Electronic Interlocking & Telecommunication for 110 Route-km Railway Doubling Section",
+    authority_name: "Rail Vikas Nigam Limited (RVNL), Ministry of Railways",
+    category: "Railways & Station Redevelopment",
+    location_state: "Madhya Pradesh",
+    estimated_value: 1480000000, // ₹148.00 Cr
+    emd_amount: 29600000,
+    published_date: new Date(Date.now() - 2 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 26 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 27 * 86400000).toISOString(),
+    direct_portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=RVNL_RAIL_ELECT_2026",
+    original_document_urls: [
+      "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=RVNL_RAIL_ELECT_2026",
+    ],
+    raw_payload: {
+      portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=RVNL_RAIL_ELECT_2026",
+      electronic_interlocking: "RDSO approved Class 4 Solid State Interlocking (SSI) with dual warm standby",
+    },
+    match_score: 94,
+    ai_summary: {
+      executive_summary: "Turnkey railway doubling electrification covering 110 km track section, traction substations (TSS), electronic interlocking at 9 stations, and optical fiber block communications.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "Core railway electrification infrastructure contract with reliable RVNL milestone billings.",
+    },
+    created_at: new Date().toISOString(),
+  },
+
+  // ==========================================================================
+  // 12. AIRPORTS & AVIATION INFRASTRUCTURE
+  // ==========================================================================
+  {
+    id: "00000000-0000-0000-0000-000000000043",
+    portal: "cppp",
+    tender_ref_number: "AAI/2026/CIVIL/TERMINAL/EXP/610",
+    title: "Expansion of Domestic Passenger Terminal Building, New Aerobridges, Apron Bay Construction and Airfield Ground Lighting (AGL)",
+    authority_name: "Airports Authority of India (AAI), Regional Headquarters",
+    category: "Airports & Aviation Infrastructure",
+    location_state: "Gujarat",
+    estimated_value: 2200000000, // ₹220.00 Cr
+    emd_amount: 44000000,
+    published_date: new Date(Date.now() - 3 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 28 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 29 * 86400000).toISOString(),
+    direct_portal_url: "https://etenders.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=AAI_TERMINAL_EXP_AGL_2026",
+    original_document_urls: [
+      "https://etenders.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=AAI_TERMINAL_EXP_AGL_2026",
+    ],
+    raw_payload: {
+      portal_url: "https://etenders.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=AAI_TERMINAL_EXP_AGL_2026",
+      bcas_clearance: "Bureau of Civil Aviation Security (BCAS) background vetting for personnel and vehicles",
+      airfield_experience: "Completion of runway/apron PQC paving works within operational airfield restrictions",
+    },
+    match_score: 93,
+    ai_summary: {
+      executive_summary: "Airport terminal expansion by 22,000 sq.m: 4 new glass aerobridges, CAT-II LED airfield ground lighting, 6 Code-C aircraft parking bays, and baggage carousel conveyors.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "High-value aviation infrastructure development with prompt AAI disbursement schedule.",
+    },
+    created_at: new Date().toISOString(),
+  },
+
+  // ==========================================================================
+  // 13. WATER SUPPLY, SMART CITIES & URBAN SANITATION
+  // ==========================================================================
+  {
+    id: "00000000-0000-0000-0000-000000000044",
+    portal: "cppp",
+    tender_ref_number: "NMCG/2026/STP/SBR/45MLD/1120",
+    title: "Design, Construction, Testing & Commissioning of 45 MLD Sequential Batch Reactor (SBR) Sewage Treatment Plant (STP) with 15-Year Operation & Maintenance",
+    authority_name: "National Mission for Clean Ganga (NMCG) / State Water Supply Board",
+    category: "Water Supply & Smart Cities",
+    location_state: "Uttar Pradesh",
+    estimated_value: 950000000, // ₹95.00 Cr
+    emd_amount: 19000000,
+    published_date: new Date(Date.now() - 4 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 25 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 26 * 86400000).toISOString(),
+    direct_portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=NMCG_STP_WATER_TREAT_2026",
+    original_document_urls: [
+      "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=NMCG_STP_WATER_TREAT_2026",
+    ],
+    raw_payload: {
+      portal_url: "https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailsExternal&service=page&tnid=NMCG_STP_WATER_TREAT_2026",
+      discharge_norms: "Treated effluent BOD < 10 mg/l, TSS < 10 mg/l, fecal coliform < 100 MPN/100ml",
+      ham_model: "Hybrid Annuity Model (HAM) with 40% capital grant and 60% annuity over 15 years",
+    },
+    match_score: 95,
+    ai_summary: {
+      executive_summary: "Flagship Namami Gange environmental sanitation project: 45 MLD sewage treatment plant using advanced SBR aerobic digestion with biogas power generation and 15-year O&M contract.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "Long-term guaranteed annuity payments funded by Central Government clean river program.",
+    },
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000045",
+    portal: "gem",
+    tender_ref_number: "GEM/2026/B/9412080",
+    title: "Supply, Deployment, System Integration and 5-Year SLA Maintenance of City-Wide Integrated Command and Control Centre (ICCC), Smart Video Analytics & IoT Environmental Sensors",
+    authority_name: "Smart Cities Mission / Municipal Urban Corporation",
+    category: "Water Supply & Smart Cities",
+    location_state: "Karnataka",
+    estimated_value: 620000000, // ₹62.00 Cr
+    emd_amount: 12400000,
+    published_date: new Date(Date.now() - 1 * 86400000).toISOString(),
+    submission_deadline: new Date(Date.now() + 20 * 86400000).toISOString(),
+    opening_date: new Date(Date.now() + 21 * 86400000).toISOString(),
+    direct_portal_url: "https://bidplus.gem.gov.in/showbidDocument/9412080",
+    original_document_urls: [
+      "https://bidplus.gem.gov.in/showbidDocument/9412080",
+    ],
+    raw_payload: {
+      portal_url: "https://bidplus.gem.gov.in/showbidDocument/9412080",
+      iccc_scope: "Video wall display, AI automated traffic violation detection (ANPR/RLVD), GIS mapping & solid waste GPS tracking",
+      msme_exemption: "Eligible for 100% EMD fee waiver under Rule 173(i) GFR 2017",
+    },
+    match_score: 94,
+    ai_summary: {
+      executive_summary: "Complete smart city nervous system: municipal command control center, 480 AI edge cameras for traffic/crowd analytics, air quality sensors, and flood monitoring gauges.",
+      bid_go_no_go_recommendation: "STRONG_BID",
+      recommendation_rationale: "Central government Smart City project with full EMD exemption available for MSME technology integrators.",
+    },
+    created_at: new Date().toISOString(),
+  },
 ];
