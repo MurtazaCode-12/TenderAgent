@@ -169,19 +169,17 @@ export async function registerContractorProfile(formData: FormData): Promise<Aut
       path: "/",
     });
 
-    // 4. Search live government portals (GeM, CPPP, State Portals) in non-blocking try-catch
-    try {
-      await searchLiveGovernmentTenders({
-        targetCategories,
-        preferredStates,
-        minTenderValue,
-        maxTenderValue,
-        certifications,
-        keywords: summary ? summary.split(" ") : [],
-      });
-    } catch (ingestErr) {
-      console.warn("[searchLiveGovernmentTenders non-blocking warning]:", ingestErr);
-    }
+    // 4. Background portal crawler (fire-and-forget, non-blocking)
+    searchLiveGovernmentTenders({
+      targetCategories,
+      preferredStates,
+      minTenderValue,
+      maxTenderValue,
+      certifications,
+      keywords: summary ? summary.split(" ") : [],
+    }).catch((ingestErr) => {
+      console.warn("[searchLiveGovernmentTenders background warning]:", ingestErr);
+    });
 
     return {
       success: true,

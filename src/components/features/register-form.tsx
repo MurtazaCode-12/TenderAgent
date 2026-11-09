@@ -169,9 +169,8 @@ export function RegisterForm() {
     formData.append("certifications", JSON.stringify(selectedCerts));
 
     startTransition(async () => {
-      setScanningStep("1/4: Initializing your secure contractor database...");
+      setScanningStep("1/2: Saving contractor profile & preferences...");
       try {
-        setScanningStep("2/4: Connecting to GeM & CPPP government portals...");
         const res = await registerContractorProfile(formData);
 
         if (res.error) {
@@ -180,12 +179,8 @@ export function RegisterForm() {
           return;
         }
 
-        setScanningStep("3/4: Matching live listings against your industry profile...");
-        setTimeout(() => {
-          setScanningStep("4/4: Opening your live Discovery Feed...");
-          router.push(res.redirectUrl || "/tenders?welcome=true");
-          router.refresh();
-        }, 800);
+        setScanningStep("2/2: Opening your live Discovery Feed...");
+        window.location.href = res.redirectUrl || "/tenders?welcome=true";
       } catch (err: any) {
         setErrorMessage(err.message || "Failed to create profile. Please try again.");
         setScanningStep("");
