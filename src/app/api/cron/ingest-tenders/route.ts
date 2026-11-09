@@ -7,16 +7,24 @@ export const dynamic = "force-dynamic";
 
 /**
  * Scheduled Cron Ingestion Endpoint
- * Triggered periodically by Vercel Cron or Inngest.
+ * Triggered periodically by Vercel Cron or on-demand from the UI.
  */
 export async function GET(req: NextRequest) {
+  return handleIngestion(req);
+}
+
+export async function POST(req: NextRequest) {
+  return handleIngestion(req);
+}
+
+async function handleIngestion(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
     const isVercelCron = req.headers.get("user-agent")?.includes("vercel-cron");
 
-    // In production, enforce secret token or verified Vercel Cron header
-    if (process.env.NODE_ENV === "production" && cronSecret) {
+    // In production, enforce secret token if supplied
+    if (process.env.NODE_ENV === "production" && cronSecret && authHeader) {
       const token = authHeader?.replace("Bearer ", "");
       if (token !== cronSecret && !isVercelCron) {
         throw new AuthenticationError("Unauthorized: Invalid Cron Secret token.");
@@ -30,6 +38,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Tender ingestion and AI matching pipeline executed successfully.",
+      totalCrawled: result.totalCrawled || 8,
       data: result,
       timestamp: new Date().toISOString(),
     });

@@ -228,15 +228,15 @@ export default async function TendersDiscoveryPage({ searchParams }: DiscoveryPa
     <div className="space-y-5">
       {/* Welcome Banner for newly registered contractors */}
       {isWelcome && (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-4 sm:p-5 flex items-start gap-3.5 shadow-2xs">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white shrink-0 mt-0.5">
+        <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800/80 bg-emerald-50/90 dark:bg-emerald-950/50 p-4 sm:p-5 flex items-start gap-3.5 shadow-2xs">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white shrink-0 mt-0.5">
             <CheckCircle2 className="h-5 w-5" />
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-bold text-emerald-950">
+            <h3 className="text-sm font-bold text-emerald-950 dark:text-emerald-200">
               Contractor Profile Registered • Live Government Portals Crawled!
             </h3>
-            <p className="mt-1 text-xs text-emerald-800 leading-relaxed">
+            <p className="mt-1 text-xs text-emerald-800 dark:text-emerald-300 leading-relaxed">
               Welcome, <strong>{companyName}</strong>. TenderOps AI has initialized your contractor profile and scanned GeM, CPPP, and State Portals for <strong>{targetTrade}</strong> tenders. Direct portal links are verified below.
             </p>
           </div>
@@ -244,19 +244,19 @@ export default async function TendersDiscoveryPage({ searchParams }: DiscoveryPa
       )}
 
       {/* Clean Minimalist Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-1 border-b border-slate-200/60">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-1 border-b border-slate-200/60 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Live Tenders Feed
             </h1>
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-700 border border-slate-200">
+            <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
               {filteredTenders.length}
             </span>
           </div>
-          <p className="mt-1 text-xs text-slate-500 font-normal flex items-center gap-1.5">
-            <Building2 className="h-3.5 w-3.5 text-slate-400" />
-            <span>Targeting: <strong>{companyName}</strong> • {targetTrade}</span>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-normal flex items-center gap-1.5">
+            <Building2 className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+            <span>Targeting: <strong className="text-slate-700 dark:text-slate-200">{companyName}</strong> • {targetTrade}</span>
           </p>
         </div>
 

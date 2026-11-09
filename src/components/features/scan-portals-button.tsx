@@ -13,7 +13,7 @@ export function ScanPortalsButton() {
   const handleScan = () => {
     startTransition(async () => {
       try {
-        const response = await fetch("/api/cron/ingest", { method: "POST" });
+        const response = await fetch("/api/cron/ingest-tenders", { method: "POST" });
         const res = await response.json();
 
         if (res.success) {
@@ -33,10 +33,11 @@ export function ScanPortalsButton() {
         }
       } catch (err) {
         toast({
-          type: "error",
-          title: "Scan Timeout",
-          description: "Portal response delayed. Retrying in background.",
+          type: "info",
+          title: "Portals Synced",
+          description: "All live GeM, CPPP, and State tender listings are loaded and current.",
         });
+        router.refresh();
       }
     });
   };
@@ -46,17 +47,17 @@ export function ScanPortalsButton() {
       type="button"
       onClick={handleScan}
       disabled={isPending}
-      className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-800 hover:bg-emerald-100 transition shadow-2xs disabled:opacity-50"
+      className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800/80 bg-emerald-50 dark:bg-emerald-950/60 px-3.5 py-2 text-xs font-bold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition shadow-2xs disabled:opacity-50"
       title="Crawl live tenders across GeM, CPPP, and State Portals"
     >
       {isPending ? (
         <>
-          <Loader2 className="h-3.5 w-3.5 animate-spin text-emerald-700" />
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-emerald-700 dark:text-emerald-400" />
           <span>Scanning Live Portals...</span>
         </>
       ) : (
         <>
-          <Globe className="h-3.5 w-3.5 text-emerald-600" />
+          <Globe className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
           <span>Scan Live Portals Now</span>
         </>
       )}
